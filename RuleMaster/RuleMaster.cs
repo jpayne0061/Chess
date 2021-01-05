@@ -312,12 +312,12 @@ namespace RuleMaster
             {
                 locations.Add(new Location { X = x, Y = chessPiece.CurrentLocation.Y });
 
-                x++;
-
                 if(chessPiece is King || !LocationIsEmpty(x, chessPiece.CurrentLocation.Y))
                 {
                     break;
                 }
+
+                x++;
             }
 
 
@@ -327,12 +327,12 @@ namespace RuleMaster
             {
                 locations.Add(new Location { X = x, Y = chessPiece.CurrentLocation.Y });
 
-                x--;
-
                 if (chessPiece is King || !LocationIsEmpty(x, chessPiece.CurrentLocation.Y))
                 {
                     break;
                 }
+
+                x--;
             }
 
             return locations;
@@ -348,12 +348,12 @@ namespace RuleMaster
             {
                 locations.Add(new Location { X = chessPiece.CurrentLocation.X, Y = y });
 
-                y++;
-
                 if (chessPiece is King || !LocationIsEmpty(chessPiece.CurrentLocation.X, y))
                 {
                     break;
                 }
+
+                y++;
             }
 
             y = chessPiece.CurrentLocation.Y - 1;
@@ -362,12 +362,12 @@ namespace RuleMaster
             {
                 locations.Add(new Location { X = chessPiece.CurrentLocation.X, Y = y });
 
-                y--;
-
                 if (chessPiece is King || !LocationIsEmpty(chessPiece.CurrentLocation.X, y))
                 {
                     break;
                 }
+
+                y--;
             }
 
             return locations;
