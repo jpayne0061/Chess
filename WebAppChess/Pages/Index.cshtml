@@ -1,0 +1,47 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div id="game-container" style="margin-top: 5%; margin-left: 30%;"></div>
+
+    <script>
+        var container = document.getElementById('game-container');
+
+        var x = 0;
+        var y = 0;
+
+        for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+                var node = document.createElement("div");
+                node.dataX = x;
+                node.dataY = y;
+                node.style.backgroundColor = x % 2 == 0 ? '#e0e0e0' : '#404040';
+                node.style.height = '40px';
+                node.style.width = '40px';
+                node.style.display = 'inline-block';
+
+                container.appendChild(node);
+                x++;
+
+            }
+
+            x++;
+
+            var breakNode = document.createElement("div");
+            container.appendChild(breakNode);
+        }
+
+
+
+    </script>
+</body>
+</html>

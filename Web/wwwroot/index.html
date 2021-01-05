@@ -1,0 +1,296 @@
+﻿    <!DOCTYPE html>
+
+    <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8" />
+        <title>Chess</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            /* Create three equal columns that floats next to each other */
+            .column {
+                float: left;
+                width: 33.33%;
+                padding: 10px;
+            }
+
+            /* Clear floats after the columns */
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            #game-container:hover {
+                cursor: pointer;
+            }
+
+            .selected {
+                box-shadow:0px 0px 0px 10px black inset;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="margin-top: 5%; margin-left: 30%;">
+            <div id="black-captured-pieces" style="font-size: 38px; height: 51px"></div>
+            <div id="game-container"></div>
+            <div id="messages" style="font-size: 22px; padding: 20px;"></div>
+            <div id="white-captured-pieces" style="font-size: 38px; height: 51px"></div>
+        </div>
+    <script>
+        var container = document.getElementById('game-container');
+
+        var pieceLookup = {
+            "whiterook": "&#9814;",
+            "whiteknight": "&#9816;",
+            "whitebishop": "&#9815;",
+            "whitequeen": "&#9813;",
+            "whiteking": "&#9812;",
+            "whitepawn": "&#9817;",
+            "blackrook": "&#9820;",
+            "blackknight": "&#9822;",
+            "blackbishop": "&#9821;",
+            "blackqueen": "&#9819;",
+            "blackking": "&#9818;",
+            "blackpawn": "&#9823;",
+        };
+
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "https://localhost:44320/api/values", true);
+        xhttp.send();
+
+        var globalStart = null
+        var globalEnd = null;
+
+        buildBoard();
+
+        function buildBoard() {
+            var x = 0;
+            var y = 0;
+
+            for (var i = 0; i < 8; i++) {
+                for (var j = 0; j < 8; j++) {
+                    var node = document.createElement("div");
+
+                    node.setAttribute('dataX', j % 8);
+                    node.setAttribute('dataY', y);
+                    node.setAttribute('id', y.toString() + (j % 8).toString());
+
+                    switch(y.toString() + (j % 8).toString()) {
+                      case "00":
+                        node.innerHTML = "&#9814;";
+                            break;
+                      case "01":
+                        node.innerHTML = "&#9816;";
+                            break;
+                      case "02":
+                        node.innerHTML = "&#9815;";
+                            break;
+                      case "03":
+                        node.innerHTML = "&#9812;";
+                            break;
+                      case "04":
+                        node.innerHTML = "&#9813;";
+                            break;
+                      case "05":
+                        node.innerHTML = "&#9815;";
+                            break;
+                      case "06":
+                        node.innerHTML = "&#9816;";
+                            break;
+                      case "07":
+                        node.innerHTML = "&#9814;";
+                            break;
+                      case "10":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "11":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "12":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "13":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "14":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "15":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "16":
+                        node.innerHTML = "&#9817;";
+                            break;
+                      case "17":
+                        node.innerHTML = "&#9817;";
+                            break;
+                       case "70":
+                        node.innerHTML = "&#9820;";
+                            break;
+                      case "71":
+                        node.innerHTML = "&#9822;";
+                            break;
+                      case "72":
+                        node.innerHTML = "&#9821;";
+                            break;
+                      case "73":
+                        node.innerHTML = "&#9818;";
+                            break;
+                      case "74":
+                        node.innerHTML = "&#9819;";
+                            break;
+                      case "75":
+                        node.innerHTML = "&#9821;";
+                            break;
+                      case "76":
+                        node.innerHTML = "&#9822;";
+                            break;
+                      case "77":
+                        node.innerHTML = "&#9820;";
+                            break;
+                      case "60":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "61":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "62":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "63":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "64":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "65":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "66":
+                        node.innerHTML = "&#9823;";
+                            break;
+                      case "67":
+                        node.innerHTML = "&#9823;";
+                            break;
+                        default:
+                            node.innerHTML = "&#9823;";
+                            node.style.color = x % 2 == 0 ? '#e0e0e0' : '#666666';
+                    }
+
+                    node.style.backgroundColor = x % 2 == 0 ? '#e0e0e0' : '#666666';
+                    node.style.height = '48px';
+                    node.style.width = '48px';
+                    node.style.fontSize = '34px';
+                    node.style.paddingLeft = '6px';
+                    node.style.display = 'inline-block';
+                    node.onclick = getCoordinates;
+
+                    container.appendChild(node);
+                    x++;
+                }
+
+                x++;
+                y++;
+
+                var breakNode = document.createElement("div"); 
+                container.appendChild(breakNode);
+            }
+        }
+
+        
+        function getCoordinates(e) {
+            var x = e.target.getAttribute('datax');
+            var y = e.target.getAttribute('datay');
+
+            giveBorder(e);
+
+            if (globalStart == null) {
+                globalStart = { x: x, y: y };
+            }
+            else {
+                if (globalStart.x == x && globalStart.y == y) {
+                    globalStart = null;
+                    globalEnd = null;
+                    removeBorder(e);
+                    return;
+                }
+
+                globalEnd = { x: x, y: y };
+
+                var move =  globalStart.y + globalStart.x + ' ' + globalEnd.y + globalEnd.x;
+
+                var xhttp = new XMLHttpRequest();
+                xhttp.open("GET", "https://localhost:44320/api/values/" + encodeURIComponent(move), true);
+                xhttp.send();
+
+                xhttp.onload = function () {
+                    var playResult = JSON.parse(this.responseText)
+                    console.log(playResult);
+                    document.getElementById("messages").innerHTML = playResult.Message;
+
+                    if (playResult.IsCheck) {
+                        document.getElementById("messages").innerHTML = "Check";
+                    }
+
+                    if (playResult.PlayValid) {
+                        var el = document.getElementById(globalStart.y + globalStart.x);
+
+
+
+                        var character = el.innerHTML;
+                        el.style.color = el.style.backgroundColor;
+
+
+                        var elTo = document.getElementById(globalEnd.y + globalEnd.x);
+                        elTo.innerHTML = character;
+                        elTo.style.color = "#000";
+                        removeBorders();
+                        globalStart = null;
+                        globalEnd = null;
+
+                        if (playResult.CapturedPiece != null) {
+                            var color = playResult.CapturedPiece.Color == 0 ? "black" : "white";
+
+                            console.log("color: ", color);
+
+                            var piece = pieceLookup[color + playResult.CapturedPiece.Name.toLowerCase()];
+
+                            document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece;
+                        }
+                    }
+                    else {
+                        removeBorders();
+                        globalStart = null;
+                        globalEnd = null;
+                    }
+
+                };
+            }
+
+            
+        }
+
+        function giveBorder(e) {
+            var element = e.target;
+
+            element.style.boxShadow = "0px 0px 0px 2px black inset";
+        }
+
+        function removeBorder(e) {
+            var element = e.target;
+
+            element.style.boxShadow = "0px 0px 0px 2px black inset";
+        }
+
+        function removeBorders() {
+            document.getElementById(globalEnd.y + globalEnd.x).style.boxShadow = "0px 0px 0px 0px black inset";
+            document.getElementById(globalStart.y + globalStart.x).style.boxShadow = "0px 0px 0px 0px black inset";
+        }
+
+    </script>
+    </body>
+    </html>
