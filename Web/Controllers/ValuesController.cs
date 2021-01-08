@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Chess.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 
@@ -12,34 +14,29 @@ namespace Web.Controllers
     public class ValuesController : ControllerBase
     {
         IMemoryCache _memoryCache;
-
-        public ValuesController(IMemoryCache memoryCache)
+        IHubContext<ChatHub> _hubContext;
+        public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext)
         {
             _memoryCache = memoryCache;
+            _hubContext = hubContext;
         }
 
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public void Get()
         {
-            List<ChessPiece> capturedPieces = new List<ChessPiece>();
 
-            Board board = new Board();
-
-            RuleMaster.RuleMaster ruleMaster = new RuleMaster.RuleMaster();
-
-            _memoryCache.Set("1", ruleMaster);
-
-            return new string[] { };
         }
 
         // GET api/values/5s
-        [HttpGet("{id}")]
-        public string Get(string id)
+        [HttpGet("{command}")]
+        public async Task<string> Get(string command)
         {
-            RuleMaster.RuleMaster ruleMaster = (RuleMaster.RuleMaster)_memoryCache.Get("1");
+            string[] splitCommand = command.Split(' ');
 
-            string[] splitCommand = id.Split(' ');
+            string gameId = splitCommand[2];
+
+            RuleMaster.RuleMaster ruleMaster = (RuleMaster.RuleMaster)_memoryCache.Get(gameId);
 
             int fromY = int.Parse(splitCommand[0][0].ToString());
             int fromX = int.Parse(splitCommand[0][1].ToString());
@@ -48,6 +45,12 @@ namespace Web.Controllers
             int toX = int.Parse(splitCommand[1][1].ToString());
 
             PlayResult pr = ruleMaster.MakeMove(new Location(fromX, fromY), new Location(toX, toY));
+
+            if(pr.PlayValid)
+            {
+                pr.Command = command;
+                await _hubContext.Clients.All.SendAsync(gameId, pr);
+            }
 
             return JsonConvert.SerializeObject(pr);
         }
@@ -66,8 +69,11 @@ namespace Web.Controllers
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(string id)
         {
+            RuleMaster.RuleMaster ruleMaster = new RuleMaster.RuleMaster();
+
+            _memoryCache.Set(id, ruleMaster);
         }
     }
 }

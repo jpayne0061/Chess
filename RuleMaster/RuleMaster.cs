@@ -251,7 +251,7 @@ namespace RuleMaster
 
             if (ProposedLocationIsValid(knight.CurrentLocation.X + 2, knight.CurrentLocation.Y - 2, knight.Color))
             {
-                locations.Add(new Location { X = knight.CurrentLocation.X + 2, Y = knight.CurrentLocation.Y - 2 });
+                locations.Add(new Location { X = knight.CurrentLocation.X + 2, Y = knight.CurrentLocation.Y - 1 });
             }
 
             if (ProposedLocationIsValid(knight.CurrentLocation.X - 2, knight.CurrentLocation.Y - 1, knight.Color))
