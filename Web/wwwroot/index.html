@@ -30,6 +30,28 @@
         .selected {
             box-shadow: 0px 0px 0px 10px black inset;
         }
+
+        @media only screen 
+        and (min-device-width : 320px) 
+        and (max-device-width : 480px) {
+        /* Here you should set what size you want your div to be 
+        when viewed on smartphone */
+        /* Styles */
+        }
+
+        /* iPads (portrait and landscape) ----------- */
+        @media only screen 
+        and (min-device-width : 768px) 
+        and (max-device-width : 1024px) {
+        /* Styles */
+        }
+
+        /* Desktops and laptops ----------- */
+        @media only screen 
+        and (min-width : 1224px) {
+        /* Styles */
+        }
+
     </style>
 </head>
 <body>
@@ -52,6 +74,8 @@
     </div>
     <script src="signalr.js"></script>
     <script>
+        var URL_ROOT = "https://localhost:44320";
+
         var GAME_ID = "";
 
         var connection = null;
@@ -59,23 +83,19 @@
         var container = document.getElementById('game-container');
 
         var pieceLookup = {
-            "whiterook"  : "&#9814;",
+            "whiterook": "&#9814;",
             "whiteknight": "&#9816;",
             "whitebishop": "&#9815;",
-            "whitequeen" : "&#9813;",
-            "whiteking"  : "&#9812;",
-            "whitepawn"  : "&#9817;",
-            "blackrook"  : "&#9820;",
+            "whitequeen": "&#9813;",
+            "whiteking": "&#9812;",
+            "whitepawn": "&#9817;",
+            "blackrook": "&#9820;",
             "blackknight": "&#9822;",
             "blackbishop": "&#9821;",
-            "blackqueen" : "&#9819;",
-            "blackking"  : "&#9818;",
-            "blackpawn"  : "&#9823;",
+            "blackqueen": "&#9819;",
+            "blackking": "&#9818;",
+            "blackpawn": "&#9823;",
         };
-
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "https://localhost:44320/api/values", true);
-        xhttp.send();
 
         var globalStart = null
         var globalEnd = null;
@@ -93,7 +113,6 @@
                 var command = message.command;
                 movePiece(message, command)
             });
-
 
             connection.start();
 
@@ -118,7 +137,7 @@
             connection.start();
 
             var xhttp = new XMLHttpRequest();
-            xhttp.open("DELETE", "https://localhost:44320/api/values/" + gameId, true);
+            xhttp.open("DELETE", URL_ROOT + "/api/values/" + gameId, true);
             xhttp.send();
 
             hideGameInputs();
@@ -127,12 +146,11 @@
         }
 
 
-
         function hideGameInputs() {
             document.getElementById('join-start').style.display = "none";
         }
 
-    function buildBoard() {
+        function buildBoard() {
             var x = 0;
             var y = 0;
 
@@ -282,6 +300,7 @@
 
             if (globalStart == null) {
                 globalStart = { x: x, y: y };
+                return;
             }
             else {
                 if (globalStart.x == x && globalStart.y == y) {
@@ -296,7 +315,7 @@
                 var move = globalStart.y + globalStart.x + ' ' + globalEnd.y + globalEnd.x + ' ' + GAME_ID;
 
                 var xhttp = new XMLHttpRequest();
-                xhttp.open("GET", "https://localhost:44320/api/values/" + encodeURIComponent(move), true);
+                xhttp.open("GET", URL_ROOT + "/api/values/" + encodeURIComponent(move), true);
                 xhttp.send();
 
                 xhttp.onload = function () {
@@ -320,8 +339,6 @@
 
                 };
             }
-
-
         }
 
         function movePiece(playResult, command) {
@@ -344,7 +361,7 @@
             else {
                 elTo.style.color = "#000";
             }
-            
+
             if (globalStart != null) {
                 removeBorders();
             }
@@ -373,7 +390,7 @@
         function removeBorder(e) {
             var element = e.target;
 
-            element.style.boxShadow = "0px 0px 0px 2px black inset";
+            element.style.boxShadow = "0px 0px 0px 0px black inset";
         }
 
         function removeBorders() {

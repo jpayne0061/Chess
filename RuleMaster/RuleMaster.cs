@@ -149,8 +149,28 @@ namespace RuleMaster
             return PositionCanBeAttacked(l, chessPiece.Color);
         }
 
-        bool IsCheckMate()
+        bool IsCheckMate(Color color)
         {
+            //is in check
+            //AND
+            //all available king moves can be attacked
+            //AND
+            //piece that has king in check cannot be attacked
+
+            ChessPiece chessPiece = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
+
+            HashSet<Location> availableLocations = GetAvailableLocations(chessPiece);
+
+            foreach (Location location in availableLocations)
+            {
+                if(!PositionCanBeAttacked(location, chessPiece.Color))
+                {
+                    return false;
+                }
+            }
+
+            
+
             throw new NotImplementedException();
         }
 
