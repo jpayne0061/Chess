@@ -96,7 +96,7 @@ namespace RuleMaster
                 availableLocations.RemoveWhere(l => PositionCanBeAttacked(l, chessPiece.Color));
             }
 
-            if(!availableLocations.Where(l => l.X == proposedLocation.X && l.Y == proposedLocation.Y).Any())
+            if(!availableLocations.Contains(proposedLocation))
             {
                 return new PlayResult($"{chessPiece.Name} cannot move to this square");
             }
@@ -116,19 +116,12 @@ namespace RuleMaster
 
             bool playerIsInCheckAfterMove = IsInCheck(GetCurrentPlayer);
 
-            if(playerIsInCheckBeforeMove && playerIsInCheckAfterMove)
+            if (playerIsInCheckAfterMove)
             {
-                playResult.PlayValid = false;
-                playResult.Message = $"{chessPiece.Color} would still be in check";
-                chessPiece.CurrentLocation = oldLocation;
+                var message = playerIsInCheckBeforeMove ? $"{chessPiece.Color} would still be in check" : $"{chessPiece.Color} would be in check";
 
-                return playResult;
-            }
-
-            if(!playerIsInCheckBeforeMove && playerIsInCheckAfterMove)
-            {
                 playResult.PlayValid = false;
-                playResult.Message = $"{chessPiece.Color} would be in check";
+                playResult.Message = message;
                 chessPiece.CurrentLocation = oldLocation;
 
                 return playResult;
@@ -168,8 +161,7 @@ namespace RuleMaster
 
         bool PositionCanBeAttacked(Location location, Color color)
         {
-            return GetAllAvailableLocations(color).
-                Where(c => c.X == location.X && c.Y == location.Y).FirstOrDefault() != null;
+            return GetAllAvailableLocations(color).Contains(location);
         }
 
         public HashSet<Location> GetAvailableLocations(ChessPiece chessPiece)
@@ -219,46 +211,22 @@ namespace RuleMaster
         {
             HashSet<Location> locations = new HashSet<Location>();
 
-            if(ProposedLocationIsValid(knight.CurrentLocation.X + 1, knight.CurrentLocation.Y + 2, knight.Color))
+            for (int y = -2; y < 3; y++)
             {
-                locations.Add(new Location { X = knight.CurrentLocation.X + 1, Y = knight.CurrentLocation.Y + 2 });
-            }
+                for (int x = -2; x < 3; x++)
+                {
+                    if(Math.Abs(x) == Math.Abs(y) || x == 0 || y == 0)
+                    {
+                        continue;
+                    }
 
-            if (ProposedLocationIsValid(knight.CurrentLocation.X + 2, knight.CurrentLocation.Y + 1, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X + 2, Y = knight.CurrentLocation.Y + 1 });
+                    if(ProposedLocationIsValid(knight.CurrentLocation.X + x, knight.CurrentLocation.Y + y, knight.Color))
+                    {
+                        locations.Add(new Location(knight.CurrentLocation.X + x, knight.CurrentLocation.Y + y ));
+                    }
+                }
             }
-
-            if (ProposedLocationIsValid(knight.CurrentLocation.X - 1, knight.CurrentLocation.Y + 2, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X - 1, Y = knight.CurrentLocation.Y + 2 });
-            }
-
-            if (ProposedLocationIsValid(knight.CurrentLocation.X - 2, knight.CurrentLocation.Y + 1, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X - 2, Y = knight.CurrentLocation.Y + 1 });
-            }
-
-            if (ProposedLocationIsValid(knight.CurrentLocation.X + 1, knight.CurrentLocation.Y - 1, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X + 1, Y = knight.CurrentLocation.Y - 1 });
-            }
-
-            if (ProposedLocationIsValid(knight.CurrentLocation.X + 1, knight.CurrentLocation.Y - 2, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X + 1, Y = knight.CurrentLocation.Y - 2 });
-            }
-
-            if (ProposedLocationIsValid(knight.CurrentLocation.X + 2, knight.CurrentLocation.Y - 2, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X + 2, Y = knight.CurrentLocation.Y - 1 });
-            }
-
-            if (ProposedLocationIsValid(knight.CurrentLocation.X - 2, knight.CurrentLocation.Y - 1, knight.Color))
-            {
-                locations.Add(new Location { X = knight.CurrentLocation.X - 2, Y = knight.CurrentLocation.Y - 1 });
-            }
-
+          
             return locations;
         }
 
@@ -268,13 +236,13 @@ namespace RuleMaster
 
             HashSet<Location> locations = new HashSet<Location>();
 
-            Location moveUpLocation = new Location { X = chessPiece.CurrentLocation.X, Y = chessPiece.CurrentLocation.Y + 1 * direction };
+            Location moveUpLocation = new Location(chessPiece.CurrentLocation.X, chessPiece.CurrentLocation.Y + 1 * direction);
 
-            Location moveUpTwoLocations = new Location { X = chessPiece.CurrentLocation.X, Y = chessPiece.CurrentLocation.Y + 2 * direction };
+            Location moveUpTwoLocations = new Location(chessPiece.CurrentLocation.X, chessPiece.CurrentLocation.Y + 2 * direction );
 
-            Location attackRight = new Location { X = chessPiece.CurrentLocation.X + 1 * direction, Y = chessPiece.CurrentLocation.Y + 1 * direction };
+            Location attackRight = new Location(chessPiece.CurrentLocation.X + 1 * direction, chessPiece.CurrentLocation.Y + 1 * direction );
 
-            Location attackLeft = new Location { X = chessPiece.CurrentLocation.X - 1 * direction, Y = chessPiece.CurrentLocation.Y + 1 * direction };
+            Location attackLeft = new Location(chessPiece.CurrentLocation.X - 1 * direction, chessPiece.CurrentLocation.Y + 1 * direction );
 
 
             if (LocationIsEmpty(moveUpLocation.X, moveUpLocation.Y) && ProposedLocationIsValid(moveUpLocation.X, moveUpLocation.Y, chessPiece.Color))
@@ -310,7 +278,7 @@ namespace RuleMaster
            
             while (ProposedLocationIsValid(x, chessPiece.CurrentLocation.Y, chessPiece.Color))
             {
-                locations.Add(new Location { X = x, Y = chessPiece.CurrentLocation.Y });
+                locations.Add(new Location( x, chessPiece.CurrentLocation.Y ));
 
                 if(chessPiece is King || !LocationIsEmpty(x, chessPiece.CurrentLocation.Y))
                 {
@@ -325,7 +293,7 @@ namespace RuleMaster
 
             while (ProposedLocationIsValid(x, chessPiece.CurrentLocation.Y, chessPiece.Color))
             {
-                locations.Add(new Location { X = x, Y = chessPiece.CurrentLocation.Y });
+                locations.Add(new Location(x, chessPiece.CurrentLocation.Y ));
 
                 if (chessPiece is King || !LocationIsEmpty(x, chessPiece.CurrentLocation.Y))
                 {
@@ -346,7 +314,7 @@ namespace RuleMaster
 
             while (ProposedLocationIsValid(chessPiece.CurrentLocation.X, y, chessPiece.Color))
             {
-                locations.Add(new Location { X = chessPiece.CurrentLocation.X, Y = y });
+                locations.Add(new Location( chessPiece.CurrentLocation.X, y ));
 
                 if (chessPiece is King || !LocationIsEmpty(chessPiece.CurrentLocation.X, y))
                 {
@@ -360,7 +328,7 @@ namespace RuleMaster
 
             while (ProposedLocationIsValid(chessPiece.CurrentLocation.X, y, chessPiece.Color))
             {
-                locations.Add(new Location { X = chessPiece.CurrentLocation.X, Y = y });
+                locations.Add(new Location(chessPiece.CurrentLocation.X, y ));
 
                 if (chessPiece is King || !LocationIsEmpty(chessPiece.CurrentLocation.X, y))
                 {
@@ -398,7 +366,7 @@ namespace RuleMaster
 
             while (ProposedLocationIsValid(x, y, chessPiece.Color))
             {
-                locations.Add(new Location { X = x, Y = y });
+                locations.Add(new Location(x, y ));
 
                 if (chessPiece is King || !LocationIsEmpty(x, y))
                 {

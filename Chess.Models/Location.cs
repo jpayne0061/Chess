@@ -1,12 +1,7 @@
 ﻿namespace Chess.Models
 {
-    public class Location
+    public struct Location
     {
-        public Location()
-        {
-
-        }
-
         public Location(int x, int y)
         {
             X = x;
