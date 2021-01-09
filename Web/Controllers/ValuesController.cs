@@ -28,9 +28,9 @@ namespace Web.Controllers
 
         }
 
-        // GET api/values/5s
+        // GET api/values/5
         [HttpGet("{command}")]
-        public async Task<string> Get(string command)
+        public async Task<string> MakeMove(string command)
         {
             string[] splitCommand = command.Split(' ');
 
@@ -57,23 +57,17 @@ namespace Web.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public void SetGame([FromBody] string gameId)
         {
+            RuleMaster.RuleMaster ruleMaster = new RuleMaster.RuleMaster();
+
+            _memoryCache.Set(gameId, ruleMaster);
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(string id)
-        {
-            RuleMaster.RuleMaster ruleMaster = new RuleMaster.RuleMaster();
-
-            _memoryCache.Set(id, ruleMaster);
         }
     }
 }

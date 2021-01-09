@@ -1,7 +1,4 @@
 ﻿using Chess.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Chess.Models
 {
@@ -10,6 +7,11 @@ namespace Chess.Models
         public PlayResult(string message)
         {
             Message = message;
+        }
+
+        public PlayResult()
+        {
+
         }
 
         public string Message { get; set; }

@@ -87,13 +87,13 @@ namespace RuleMaster
 
             Location oldLocation = new Location(chessPiece.CurrentLocation.X, chessPiece.CurrentLocation.Y);
 
-            bool playerIsInCheckBeforeMove = IsInCheck(GetCurrentPlayer);
+            bool playerIsInCheckBeforeMove = IsInCheck(GetCurrentPlayer).Any();
 
-            var availableLocations = GetAvailableLocations(chessPiece);
+            var availableLocations = GetAvailableMoves(chessPiece);
 
             if(chessPiece is King)
             {
-                availableLocations.RemoveWhere(l => PositionCanBeAttacked(l, chessPiece.Color));
+                availableLocations.RemoveWhere(l => PositionCanBeCapturedBy(l, chessPiece.Color).Any());
             }
 
             if(!availableLocations.Contains(proposedLocation))
@@ -101,7 +101,7 @@ namespace RuleMaster
                 return new PlayResult($"{chessPiece.Name} cannot move to this square");
             }
 
-            var playResult = new PlayResult($"{chessPiece.Name} has been moved");
+            var playResult = new PlayResult();
 
             playResult.CapturedPiece = _chessPieces.Where(c => c.CurrentLocation.X == proposedLocation.X &&
                                 c.CurrentLocation.Y == proposedLocation.Y).FirstOrDefault();
@@ -114,7 +114,7 @@ namespace RuleMaster
 
             chessPiece.CurrentLocation = proposedLocation;
 
-            bool playerIsInCheckAfterMove = IsInCheck(GetCurrentPlayer);
+            bool playerIsInCheckAfterMove = IsInCheck(GetCurrentPlayer).Any();
 
             if (playerIsInCheckAfterMove)
             {
@@ -134,44 +134,64 @@ namespace RuleMaster
                 chessPiece.IsFirstMove = false;
                 _whitesTurn = !_whitesTurn;
                 playResult.Turn = _whitesTurn ? Color.White : Color.Black;
-                playResult.IsCheck = IsInCheck(GetCurrentPlayer);
+
+                var piecesThatCanCaptureKing = IsInCheck(GetCurrentPlayer);
+
+                playResult.IsCheck = piecesThatCanCaptureKing.Any();
+                playResult.IsCheckMate = playResult.IsCheck ? IsCheckMate(GetCurrentPlayer, piecesThatCanCaptureKing): false;
+
+
             }
 
             return playResult;
         }
 
-        public bool IsInCheck(Color color)
+        public HashSet<ChessPiece> IsInCheck(Color color)
         {
             ChessPiece chessPiece = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 
             Location l = chessPiece.CurrentLocation;
 
-            return PositionCanBeAttacked(l, chessPiece.Color);
+            return PositionCanBeCapturedBy(l, chessPiece.Color);
         }
 
-        bool IsCheckMate(Color color)
+        bool IsCheckMate(Color color, HashSet<ChessPiece> piecesThatCanCaptureKing)
         {
-            //is in check
-            //AND
-            //all available king moves can be attacked
-            //AND
-            //piece that has king in check cannot be attacked
+            King king = (King)_chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 
-            ChessPiece chessPiece = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
-
-            HashSet<Location> availableLocations = GetAvailableLocations(chessPiece);
-
-            foreach (Location location in availableLocations)
+            if(KingCanEscape(king))
             {
-                if(!PositionCanBeAttacked(location, chessPiece.Color))
+                return false;
+            }
+
+            if(piecesThatCanCaptureKing.Count > 1)
+            {
+                return true;
+            }
+
+            ChessPiece pieceThatCanCaptureKing = piecesThatCanCaptureKing.First();
+
+            if(PositionCanBeCapturedBy(pieceThatCanCaptureKing.CurrentLocation, pieceThatCanCaptureKing.Color).Any())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        bool KingCanEscape(King king)
+        {
+            HashSet<Location> availableMoves = GetAvailableMoves(king);
+
+            foreach (Location location in availableMoves)
+            {
+                if (!PositionCanBeCapturedBy(location, king.Color).Any())
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            
-
-            throw new NotImplementedException();
+            return false;
         }
 
         bool LocationIsEmpty(int x, int y)
@@ -179,12 +199,22 @@ namespace RuleMaster
             return !_chessPieces.Where(p => p.CurrentLocation.X == x && p.CurrentLocation.Y == y).Any();
         }
 
-        bool PositionCanBeAttacked(Location location, Color color)
+        HashSet<ChessPiece> PositionCanBeCapturedBy(Location location, Color color)
         {
-            return GetAllAvailableLocations(color).Contains(location);
+            HashSet<ChessPiece> pieces = new HashSet<ChessPiece>();
+
+            foreach (KeyValuePair<ChessPiece, HashSet<Location>> kvp in GetAllAvailableLocations(color))
+            {
+                if(kvp.Value.Contains(location))
+                {
+                    pieces.Add(kvp.Key);
+                }
+            }
+
+            return pieces;
         }
 
-        public HashSet<Location> GetAvailableLocations(ChessPiece chessPiece)
+        public HashSet<Location> GetAvailableMoves(ChessPiece chessPiece)
         {
             HashSet<Location> locations = new HashSet<Location>();
 
@@ -212,19 +242,19 @@ namespace RuleMaster
             return locations;
         }
 
-        public HashSet<Location> GetAllAvailableLocations(Color color)
+        public Dictionary<ChessPiece, HashSet<Location>> GetAllAvailableLocations(Color color)
         {
-            HashSet<Location> locations = new HashSet<Location>();
+            var pieceToAttackableLocations = new Dictionary<ChessPiece, HashSet<Location>>();
 
             foreach (var chp in _chessPieces)
             {
                 if(chp.Color != color)
                 {
-                    locations.UnionWith(GetAvailableLocations(chp));
+                    pieceToAttackableLocations[chp] = GetAvailableMoves(chp);
                 }
             }
 
-            return locations;
+            return pieceToAttackableLocations;
         }
 
         HashSet<Location> GetAvailableKnightLocations(Knight knight)
