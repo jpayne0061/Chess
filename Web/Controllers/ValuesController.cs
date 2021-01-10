@@ -28,6 +28,15 @@ namespace Web.Controllers
 
         }
 
+        [HttpGet("{gameId}")]
+        [Route("[action]")]
+        public bool ValidGame(string gameId)
+        {
+            object val;
+
+            return _memoryCache.TryGetValue(gameId, out val);
+        }
+
         // GET api/values/5
         [HttpGet("{command}")]
         public async Task<string> MakeMove(string command)
@@ -54,6 +63,8 @@ namespace Web.Controllers
 
             return JsonConvert.SerializeObject(pr);
         }
+
+
 
         // POST api/values
         [HttpPost]

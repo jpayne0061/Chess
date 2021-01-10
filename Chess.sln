@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess", "Chess\Chess.csproj", "{744D1EFD-0A60-4BAE-9303-2150A5FB8E04}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Models", "Chess.Models\Chess.Models.csproj", "{E2A1C59D-4E50-41F8-B881-A1B204F833CC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuleMaster", "RuleMaster\RuleMaster.csproj", "{AF0331C0-1D02-4A4C-8454-117722B8ACD1}"
@@ -17,10 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{744D1EFD-0A60-4BAE-9303-2150A5FB8E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{744D1EFD-0A60-4BAE-9303-2150A5FB8E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{744D1EFD-0A60-4BAE-9303-2150A5FB8E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{744D1EFD-0A60-4BAE-9303-2150A5FB8E04}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E2A1C59D-4E50-41F8-B881-A1B204F833CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2A1C59D-4E50-41F8-B881-A1B204F833CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2A1C59D-4E50-41F8-B881-A1B204F833CC}.Release|Any CPU.ActiveCfg = Release|Any CPU

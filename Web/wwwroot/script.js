@@ -33,10 +33,7 @@ var pieceLookup = {
 var globalStart = null;
 var globalEnd = null;
 
-function joinGame() {
-
-    GAME_ID = document.getElementById('join-game').value;;
-
+function setUp() {
     connectToHub();
 
     buildBoard();
@@ -45,6 +42,15 @@ function joinGame() {
 
     PLAYER_COLOR = 0;
 }
+
+function joinGame() {
+
+    GAME_ID = document.getElementById('join-game').value;
+
+    checkIfGameIdValid(setUp);
+}
+
+
 
 function startGame() {
     var gameId = document.getElementById('start-game').value;
@@ -69,7 +75,7 @@ function connectToHub() {
     connection.on(GAME_ID, function (message) {
         console.log("signalr", message);
         var command = message.command;
-        movePiece(message, command)
+        movePiece(message, command);
     });
 
     connection.start();
@@ -97,6 +103,25 @@ function startNewGame() {
     xhttp.send('"' + GAME_ID + '"');
 }
 
+function checkIfGameIdValid(setUp) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", URL_ROOT + "/api/GameState/" + GAME_ID, true);
+    xhttp.send();
+
+    xhttp.onload = function () {
+        console.log("resposne text: ", this.responseText);
+
+        if ('true' === this.responseText) {
+            setUp();
+        }
+        else {
+            alert('you have not entered a valid game id');
+            return;
+        }
+    };
+
+
+}
 
 
 function buildBoard() {
