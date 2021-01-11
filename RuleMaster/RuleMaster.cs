@@ -239,8 +239,15 @@ namespace RuleMaster
                 locations.UnionWith(GetDiagonalLocations(chessPiece));
             }
 
+            if(chessPiece is King)
+            {
+                GetCastleMove((King)chessPiece);
+            }
+
             return locations;
         }
+
+
 
         public Dictionary<ChessPiece, HashSet<Location>> GetAllAvailableLocations(Color color)
         {
@@ -255,6 +262,23 @@ namespace RuleMaster
             }
 
             return pieceToAttackableLocations;
+        }
+
+        HashSet<Location> GetCastleMove(King king)
+        {
+            HashSet<Location> locations = new HashSet<Location>();
+
+            if (!king.IsFirstMove)
+            {
+                return locations;
+            }
+
+            //get horizontal +- both sides
+
+            //if rook has not moved, castling is possible
+
+
+            return locations;
         }
 
         HashSet<Location> GetAvailableKnightLocations(Knight knight)

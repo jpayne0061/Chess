@@ -11,6 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HotSauceDB\HotSauceDBOrm\HotSauceDbOrm.csproj" />
+    <ProjectReference Include="..\..\HotSauceDB\HotSauceDB\HotSauceDB.csproj" />
     <ProjectReference Include="..\Chess.Models\Chess.Models.csproj" />
     <ProjectReference Include="..\RuleMaster\RuleMaster.csproj" />
   </ItemGroup>

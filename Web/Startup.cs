@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using Chess.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SharpDbOrm;
+using Web.Data;
 
 namespace Web
 {
@@ -21,6 +24,11 @@ namespace Web
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
+
+            var executor = new Executor();
+            executor.CreateTable<PlayResultEntity>();
+            services.AddSingleton(executor);
+            services.AddTransient<PlayResultDAL, PlayResultDAL>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

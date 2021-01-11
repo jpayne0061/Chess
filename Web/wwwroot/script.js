@@ -10,6 +10,8 @@ var CHECK_MATE = false;
 
 var PLAYER_COLOR = 0;
 
+var YOUR_TURN = false;
+
 var INVALID_PLAY_TYPES = {
     0: "Wrong player",
     1 : "Out of turn"
@@ -65,16 +67,36 @@ function startGame() {
 
     buildBoard();
 
+    rotateBoard();
+
     PLAYER_COLOR = 1;
+
+    YOUR_TURN = true;
+
+    document.getElementById('messages').innerHTML = 'it is your turn';
 }
 
+function rotateBoard() {
+    container.classList.add("rotated");
+
+    var pieces = container.children;
+
+    for (var i = 0; i < pieces.length; i++) {
+        pieces[i].classList.add("rotated");
+    }
+
+}
 
 function connectToHub() {
     connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
     connection.on(GAME_ID, function (message) {
-        console.log("signalr", message);
         var command = message.command;
+
+        if (message.turn === PLAYER_COLOR) {
+            document.getElementById('messages').innerHTML = 'it is your turn';
+        }
+
         movePiece(message, command);
     });
 
@@ -89,6 +111,8 @@ function restartGame() {
     CHECK_MATE = false;
 
     container.innerHTML = '';
+    document.getElementById('white-captured-pieces').innerHTML = '';
+    document.getElementById('black-captured-pieces').innerHTML = '';
 
     buildBoard();
 
@@ -119,8 +143,6 @@ function checkIfGameIdValid(setUp) {
             return;
         }
     };
-
-
 }
 
 
@@ -264,7 +286,6 @@ function buildBoard() {
         container.appendChild(breakNode);
     }
 }
-
 
 
 

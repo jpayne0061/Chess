@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Chess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
+using SharpDbOrm;
+using Web.Data;
 
 namespace Web.Controllers
 {
@@ -15,10 +15,14 @@ namespace Web.Controllers
     {
         IMemoryCache _memoryCache;
         IHubContext<ChatHub> _hubContext;
-        public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext)
+        PlayResultDAL _dal;
+        Executor _executor;
+
+        public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext, PlayResultDAL dal)
         {
             _memoryCache = memoryCache;
             _hubContext = hubContext;
+            _dal = dal;
         }
 
         // GET api/values
@@ -60,6 +64,8 @@ namespace Web.Controllers
                 pr.Command = command;
                 await _hubContext.Clients.All.SendAsync(gameId, pr);
             }
+
+            _dal.SavePlayResult(pr);
 
             return JsonConvert.SerializeObject(pr);
         }
