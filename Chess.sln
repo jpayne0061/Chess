@@ -9,10 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RuleMaster", "RuleMaster\Ru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{A117F77D-E545-4BB8-A8CF-748027C4CF82}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotSauceDB", "..\HotSauceDB\HotSauceDB\HotSauceDB.csproj", "{DD5DCC13-74D3-4E89-A6CD-75664B2091A2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HotSauceDbOrm", "..\HotSauceDB\HotSauceDBOrm\HotSauceDbOrm.csproj", "{2480276D-3E5C-4B5D-A08B-EC133BAC52C6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,6 @@ Global
 		{A117F77D-E545-4BB8-A8CF-748027C4CF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A117F77D-E545-4BB8-A8CF-748027C4CF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A117F77D-E545-4BB8-A8CF-748027C4CF82}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DD5DCC13-74D3-4E89-A6CD-75664B2091A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DD5DCC13-74D3-4E89-A6CD-75664B2091A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DD5DCC13-74D3-4E89-A6CD-75664B2091A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DD5DCC13-74D3-4E89-A6CD-75664B2091A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2480276D-3E5C-4B5D-A08B-EC133BAC52C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2480276D-3E5C-4B5D-A08B-EC133BAC52C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2480276D-3E5C-4B5D-A08B-EC133BAC52C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2480276D-3E5C-4B5D-A08B-EC133BAC52C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
