@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
-using SharpDbOrm;
 using Web.Data;
 
 namespace Web.Controllers
@@ -16,20 +15,12 @@ namespace Web.Controllers
         IMemoryCache _memoryCache;
         IHubContext<ChatHub> _hubContext;
         PlayResultDAL _dal;
-        Executor _executor;
 
         public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext, PlayResultDAL dal)
         {
             _memoryCache = memoryCache;
             _hubContext = hubContext;
             _dal = dal;
-        }
-
-        // GET api/values
-        [HttpGet]
-        public void Get()
-        {
-
         }
 
         [HttpGet("{gameId}")]
@@ -71,7 +62,6 @@ namespace Web.Controllers
         }
 
 
-
         // POST api/values
         [HttpPost]
         public void SetGame([FromBody] string gameId)
@@ -81,10 +71,5 @@ namespace Web.Controllers
             _memoryCache.Set(gameId, ruleMaster);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
     }
 }

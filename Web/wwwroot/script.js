@@ -1,4 +1,4 @@
-﻿var URL_ROOT = "https://localhost:44320";
+﻿var URL_ROOT = "https://chesswithhotsauce.azurewebsites.net";
 
 var GAME_ID = "";
 

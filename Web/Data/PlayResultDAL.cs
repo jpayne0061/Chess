@@ -1,5 +1,5 @@
 ﻿using Chess.Models;
-using SharpDbOrm;
+using HotSauceDbOrm;
 
 namespace Web.Data
 { 
@@ -21,10 +21,7 @@ namespace Web.Data
 
                 _executor.Insert(playResultEntity);
             }
-            catch
-            {
-
-            }
+            catch { }
         }
     }
 }
