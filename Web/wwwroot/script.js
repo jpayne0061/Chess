@@ -1,4 +1,5 @@
 ﻿var URL_ROOT = "https://chesswithhotsauce.azurewebsites.net";
+//var URL_ROOT = "https://localhost:44320";
 
 var GAME_ID = "";
 
@@ -55,12 +56,9 @@ function joinGame() {
 
 
 function startGame() {
-    var gameId = document.getElementById('start-game').value;
+    //var gameId = document.getElementById('start-game').value;
 
-    GAME_ID = gameId;
-
-    connectToHub();
-
+    //GAME_ID = gameId;
     startNewGame();
 
     hideGameInputs();
@@ -122,9 +120,20 @@ function restartGame() {
 
 function startNewGame() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", URL_ROOT + "/api/values", true);
-    xhttp.setRequestHeader("Content-Type", "application/json");
-    xhttp.send('"' + GAME_ID + '"');
+    xhttp.open("GET", URL_ROOT + "/api/values/SetGame", true);
+    xhttp.send();
+
+    xhttp.onload = function () {
+        console.log("post game key response text: ", this.responseText);
+
+        GAME_ID = this.responseText;
+
+        connectToHub();
+
+        alert('Your game key is ' + GAME_ID);
+
+        document.getElementById('game-key').innerHTML = GAME_ID;
+    };
 }
 
 function checkIfGameIdValid(setUp) {
@@ -133,7 +142,7 @@ function checkIfGameIdValid(setUp) {
     xhttp.send();
 
     xhttp.onload = function () {
-        console.log("resposne text: ", this.responseText);
+        console.log("response text: ", this.responseText);
 
         if ('true' === this.responseText) {
             setUp();
@@ -163,52 +172,52 @@ function buildBoard() {
 
             switch (locationCoords) {
                 case "00":
-                    node.innerHTML = "&#9814;";
+                    node.innerHTML = "&#9814;"; //whiterook
                     break;
                 case "01":
-                    node.innerHTML = "&#9816;";
+                    node.innerHTML = "&#9816;"; //whiteknight
                     break;
                 case "02":
-                    node.innerHTML = "&#9815;";
+                    node.innerHTML = "&#9815;"; //whitebishop
                     break;
                 case "03":
-                    node.innerHTML = "&#9812;";
+                    node.innerHTML = "&#9812;"; //whiteking
                     break;
                 case "04":
-                    node.innerHTML = "&#9813;";
+                    node.innerHTML = "&#9813;"; //whitequeen
                     break;
                 case "05":
-                    node.innerHTML = "&#9815;";
+                    node.innerHTML = "&#9815;"; //whitebishop
                     break;
                 case "06":
-                    node.innerHTML = "&#9816;";
+                    node.innerHTML = "&#9816;"; //whiteknight
                     break;
                 case "07":
-                    node.innerHTML = "&#9814;";
+                    node.innerHTML = "&#9814;"; //whiterook
                     break;
                 case "10":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "11":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "12":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "13":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "14":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "15":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "16":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "17":
-                    node.innerHTML = "&#9817;";
+                    node.innerHTML = "&#9817;"; //whitepawn
                     break;
                 case "70":
                     node.innerHTML = "&#9820;";

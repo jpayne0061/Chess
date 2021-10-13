@@ -139,8 +139,6 @@ namespace RuleMaster
 
                 playResult.IsCheck = piecesThatCanCaptureKing.Any();
                 playResult.IsCheckMate = playResult.IsCheck ? IsCheckMate(GetCurrentPlayer, piecesThatCanCaptureKing): false;
-
-
             }
 
             return playResult;
@@ -159,7 +157,11 @@ namespace RuleMaster
         {
             King king = (King)_chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 
-            if(KingCanEscape(king))
+            IEnumerable<ChessPiece> kingsColorPieces = _chessPieces.Where(c => c.Color == color);
+
+            HashSet<Location> availableMoves = GetAllAvailableLocations(color).SelectMany(x => x.Value).ToHashSet();
+
+            if (KingCanEscape(king))
             {
                 return false;
             }
@@ -176,8 +178,107 @@ namespace RuleMaster
                 return false;
             }
 
+            if(pieceThatCanCaptureKing is Knight || pieceThatCanCaptureKing is Pawn)
+            {
+                //path of knight or pawn cannot be intercepted
+                return true;
+            }
+
+            if(pieceThatCanCaptureKing is Rook)
+            {
+                //get path between rook current location and king current location
+                HashSet<Location> rookCapturePath = HorizontalVerticalCapturePath(king.CurrentLocation, pieceThatCanCaptureKing.CurrentLocation);
+
+                //can it be intercepted? get available locations of kings color. Do any intersect with capture path? 
+                bool capturePathCanBeIntercepted = availableMoves.Intersect(rookCapturePath).Any();
+
+                return !capturePathCanBeIntercepted;
+
+            }
+            else if(pieceThatCanCaptureKing is Bishop)
+            {
+                HashSet<Location> bishopCapturePath = BuildDiagonalPath(king.CurrentLocation, pieceThatCanCaptureKing.CurrentLocation);
+
+                bool capturePathCanBeIntercepted = availableMoves.Intersect(bishopCapturePath).Any();
+
+                return !capturePathCanBeIntercepted;
+            }
+            else if(pieceThatCanCaptureKing is Queen)
+            {
+                //at this point, the code doesn't know if the queeen can capture the king
+                //using vertical/horizontal moves or diagonal moves
+
+                HashSet<Location> horizontalVerticalCapturePath = HorizontalVerticalCapturePath(king.CurrentLocation, pieceThatCanCaptureKing.CurrentLocation);
+
+                if(!horizontalVerticalCapturePath.Contains(king.CurrentLocation))
+                {
+                    horizontalVerticalCapturePath = new HashSet<Location>();
+                }
+
+                HashSet<Location> diagonalCapturePath = BuildDiagonalPath(king.CurrentLocation, pieceThatCanCaptureKing.CurrentLocation);
+
+                bool capturePathCanBeIntercepted = horizontalVerticalCapturePath.Union(diagonalCapturePath).Intersect(availableMoves).Any();
+
+                return !capturePathCanBeIntercepted;
+            }
+
             return true;
         }
+
+        HashSet<Location> HorizontalVerticalCapturePath(Location kingLocation, Location rookLocation)
+        {
+            bool xAxisCommon = kingLocation.X == rookLocation.X;
+
+            HashSet<Location> capturePath;
+
+            if (xAxisCommon)
+            {
+                capturePath = BuildHorizontalVerticalPath(kingLocation.X, kingLocation.Y, rookLocation.Y);
+            }
+            else
+            {
+                capturePath = BuildHorizontalVerticalPath(kingLocation.Y, kingLocation.X, rookLocation.X);
+            }
+
+            return capturePath;
+        }
+
+        HashSet<Location> BuildHorizontalVerticalPath(int commonAxis, int targetPosition, int capturerPosition)
+        {
+            HashSet<Location> capturePath = new HashSet<Location>();
+
+            int maxPosition = Math.Max(targetPosition, capturerPosition);
+
+            int minPosition = Math.Min(targetPosition, capturerPosition);
+
+            for (int i = minPosition; i <= maxPosition; i++)
+            {
+                capturePath.Add(new Location(commonAxis, i));
+            }
+
+            return capturePath;
+        }
+
+        HashSet<Location> BuildDiagonalPath(Location targetPosition, Location capturerPosition)
+        {
+            HashSet<Location> capturePath = new HashSet<Location>();
+
+            var slope = (capturerPosition.Y - targetPosition.Y) / (capturerPosition.X - targetPosition.X);
+            var yIntercept = targetPosition.Y - slope * targetPosition.X;
+
+            Location minXLocation = targetPosition.X < capturerPosition.X ? targetPosition : capturerPosition;
+            Location maxXLocation = targetPosition.X > capturerPosition.X ? targetPosition : capturerPosition;
+
+            for (int i = minXLocation.X + 1; i < maxXLocation.X; i++)
+            {
+                var y = slope * i + yIntercept;
+
+                capturePath.Add(new Location(i, y));
+            }
+
+            return capturePath;
+        }
+   
 
         bool KingCanEscape(King king)
         {

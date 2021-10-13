@@ -16,7 +16,6 @@
         <button id="restart-game" onclick="restartGame()" style="display: none">New Game</button>
 
         <div id="join-start">
-            <input style="width: 220px" id="start-game" type="text" placeholder="start game - make up a game key" value="" />
             <button onclick="startGame()">Start Game</button>
             <br>
             <br>
@@ -24,7 +23,7 @@
             <button onclick="joinGame()">Join Game</button>
         </div>
 
-
+        <div style="position: fixed; bottom: 0;font-size: 30px">game key: <span id="game-key"></span></div>
     </div>
     <script src="signalr.js"></script>
     <script src="script.js"></script>

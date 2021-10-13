@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Chess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -15,21 +17,21 @@ namespace Web.Controllers
         IMemoryCache _memoryCache;
         IHubContext<ChatHub> _hubContext;
         PlayResultDAL _dal;
+        private GameKeyDal _gameKeyDal;
 
-        public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext, PlayResultDAL dal)
+        public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext, PlayResultDAL dal, GameKeyDal gameKeyDal)
         {
             _memoryCache = memoryCache;
             _hubContext = hubContext;
             _dal = dal;
+            _gameKeyDal = gameKeyDal;
         }
 
-        [HttpGet("{gameId}")]
+        [HttpGet("{gameKey}")]
         [Route("[action]")]
-        public bool ValidGame(string gameId)
+        public bool ValidGame(string gameKey)
         {
-            object val;
-
-            return _memoryCache.TryGetValue(gameId, out val);
+            return _gameKeyDal.GameKeyExists(gameKey);
         }
 
         // GET api/values/5
@@ -63,12 +65,61 @@ namespace Web.Controllers
 
 
         // POST api/values
-        [HttpPost]
-        public void SetGame([FromBody] string gameId)
+        [HttpGet]
+        [Route("[action]")]
+        public string SetGame()
         {
-            RuleMaster.RuleMaster ruleMaster = new RuleMaster.RuleMaster();
+            string gameKey = GenerateGameKey();
 
-            _memoryCache.Set(gameId, ruleMaster);
+            while(_gameKeyDal.GameKeyExists(gameKey))
+            {
+                gameKey = GenerateGameKey();
+            }
+
+            _gameKeyDal.InsertGameKey(gameKey);
+
+            _memoryCache.Set(gameKey, new RuleMaster.RuleMaster());
+
+            return gameKey;
+        }
+
+        private string GenerateGameKey()
+        {
+            Random random = new Random();
+
+            List<string> adjectives = new List<string>
+            {
+                "silly",
+                "quiet",
+                "funny",
+                "loud",
+                "small",
+                "big",
+                "green",
+                "jumpy",
+                "slippery",
+                "tiny",
+                "little"
+            };
+
+            List<string> nouns = new List<string>
+            {
+                "dog",
+                "cat",
+                "rhino",
+                "fish",
+                "bird",
+                "snake",
+                "turtle",
+                "dragon",
+                "panda",
+                "dino"
+            };
+
+            var adjective = adjectives[random.Next(0, adjectives.Count)];
+            var noun = nouns[random.Next(0, nouns.Count)];
+
+            return adjective + "-" + noun;
         }
 
     }

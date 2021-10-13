@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+using Web.Data;
 
 namespace Web.Controllers
 {
@@ -7,19 +7,17 @@ namespace Web.Controllers
     [ApiController]
     public class GameStateController : ControllerBase
     {
-        private readonly IMemoryCache _memoryCache;
+        private readonly GameKeyDal _gameKeyDal;
 
-        public GameStateController(IMemoryCache memoryCache)
+        public GameStateController(GameKeyDal gameKeyDal)
         {
-            _memoryCache = memoryCache;
+            _gameKeyDal = gameKeyDal;
         }
 
-        [HttpGet("{gameId}")]
-        public bool GameIdIsValid(string gameId)
+        [HttpGet("{gameKey}")]
+        public bool GameIdIsValid(string gameKey)
         {
-            var gameIsValid = _memoryCache.TryGetValue(gameId, out object val);
-
-            return gameIsValid;
+            return _gameKeyDal.GameKeyExists(gameKey);
         }
     }
 }

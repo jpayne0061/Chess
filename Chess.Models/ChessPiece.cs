@@ -1,6 +1,4 @@
 ﻿using Chess.Models.Enums;
-using System;
-using System.Collections.Generic;
 
 namespace Chess.Models
 {

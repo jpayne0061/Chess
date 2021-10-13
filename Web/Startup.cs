@@ -27,8 +27,10 @@ namespace Web
 
             var executor = Executor.GetInstance();
             executor.CreateTable<PlayResultEntity>();
+            executor.CreateTable<GameKey>();
             services.AddSingleton(executor);
             services.AddTransient<PlayResultDAL, PlayResultDAL>();
+            services.AddTransient<GameKeyDal, GameKeyDal>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
