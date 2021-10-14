@@ -1,5 +1,9 @@
-﻿var URL_ROOT = "https://chesswithhotsauce.azurewebsites.net";
-//var URL_ROOT = "https://localhost:44320";
+﻿if (window.location.href.indexOf('localhost')) {
+    URL_ROOT = 'https://localhost:44320';
+}
+else {
+    URL_ROOT = 'https://chesswithhotsauce.azurewebsites.net';
+}
 
 var GAME_ID = "";
 
@@ -56,9 +60,6 @@ function joinGame() {
 
 
 function startGame() {
-    //var gameId = document.getElementById('start-game').value;
-
-    //GAME_ID = gameId;
     startNewGame();
 
     hideGameInputs();
@@ -89,10 +90,19 @@ function connectToHub() {
     connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
     connection.on(GAME_ID, function (message) {
+        console.log("message from hub: ", message);
+
         var command = message.command;
 
-        if (message.turn === PLAYER_COLOR) {
+        if (message.isCheckMate) {
+            CHECK_MATE = true;
+            document.getElementById('messages').innerHTML = 'check mate';
+        }
+        else if (message.turn === PLAYER_COLOR) {
             document.getElementById('messages').innerHTML = 'it is your turn';
+        }
+        else if (message.isCheck) {
+            document.getElementById('messages').innerHTML = 'check';
         }
 
         movePiece(message, command);
@@ -133,6 +143,7 @@ function startNewGame() {
         alert('Your game key is ' + GAME_ID);
 
         document.getElementById('game-key').innerHTML = GAME_ID;
+        document.getElementById('game-key-container').style.display = 'block';
     };
 }
 

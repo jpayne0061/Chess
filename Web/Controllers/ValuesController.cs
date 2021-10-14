@@ -119,7 +119,7 @@ namespace Web.Controllers
             var adjective = adjectives[random.Next(0, adjectives.Count)];
             var noun = nouns[random.Next(0, nouns.Count)];
 
-            return adjective + "-" + noun;
+            return adjective + noun + random.Next(0, 100).ToString();
         }
 
     }

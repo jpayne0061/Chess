@@ -146,11 +146,11 @@ namespace RuleMaster
 
         public HashSet<ChessPiece> IsInCheck(Color color)
         {
-            ChessPiece chessPiece = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
+            ChessPiece king = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 
-            Location l = chessPiece.CurrentLocation;
+            Location kingLocation = king.CurrentLocation;
 
-            return PositionCanBeCapturedBy(l, chessPiece.Color);
+            return PositionCanBeCapturedBy(kingLocation, king.Color);
         }
 
         bool IsCheckMate(Color color, HashSet<ChessPiece> piecesThatCanCaptureKing)
@@ -159,7 +159,9 @@ namespace RuleMaster
 
             IEnumerable<ChessPiece> kingsColorPieces = _chessPieces.Where(c => c.Color == color);
 
-            HashSet<Location> availableMoves = GetAllAvailableLocations(color).SelectMany(x => x.Value).ToHashSet();
+            Color opposingColor = Color.White == color ? Color.Black : Color.White;
+
+            HashSet<Location> availableMoves = GetAllAvailableLocations(opposingColor).Where(x => x.Key.Name != "King").SelectMany(x => x.Value).ToHashSet();
 
             if (KingCanEscape(king))
             {
