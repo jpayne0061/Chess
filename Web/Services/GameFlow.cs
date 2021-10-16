@@ -66,6 +66,11 @@ namespace Web.Services
             return gameKey;
         }
 
+        public async Task SendJoinNotification(string gameId)
+        {
+            await _hubContext.Clients.All.SendAsync(gameId.Trim(), "player-joined");
+        }
+
         private string GenerateGameKey()
         {
             Random random = new Random();

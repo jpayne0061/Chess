@@ -31,7 +31,7 @@ namespace Web.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public bool JoinGame(string gameKey)
+        public async Task<bool> JoinGame(string gameKey)
         {
             GameSession game = _gameSessionDal.GetGameSessionByKey(gameKey);
 
@@ -43,6 +43,8 @@ namespace Web.Controllers
             game.Joined = true;
 
             _gameSessionDal.UpdateGame(game);
+
+            await _gameFlow.SendJoinNotification(game.Key);
 
             return true;
         }

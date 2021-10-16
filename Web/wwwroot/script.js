@@ -17,6 +17,8 @@ var PLAYER_COLOR = 0;
 
 var YOUR_TURN = false;
 
+var OTHER_PLAYER_HAS_JOINED = false;
+
 var INVALID_PLAY_TYPES = {
     0: "Wrong player",
     1 : "Out of turn"
@@ -41,6 +43,8 @@ var globalStart = null;
 var globalEnd = null;
 
 function setUp() {
+    OTHER_PLAYER_HAS_JOINED = true;
+
     document.getElementById('recently-started-games').style.display = 'none';
 
     connectToHub();
@@ -114,6 +118,12 @@ function connectToHub() {
 
     CONNECTION.on(GAME_ID, function (message) {
         console.log("message from hub: ", message);
+
+        if (message === 'player-joined') {
+            OTHER_PLAYER_HAS_JOINED = true;
+            alert('player has joined your game');
+            return;
+        }
 
         var command = message.command;
 
@@ -395,6 +405,12 @@ function buildBoard() {
 
 
 function getCoordinates(e) {
+
+    if (!OTHER_PLAYER_HAS_JOINED) {
+        alert('you must wait for other player to join game');
+        return;
+    }
+    
 
     console.log("e: ", e);
 
