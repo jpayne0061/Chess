@@ -2,6 +2,7 @@
 using HotSauceDbOrm;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Web.Interfaces;
 
 namespace Web.Data
@@ -22,16 +23,31 @@ namespace Web.Data
             return exists;
         }
 
+        public GameSession GetGameSessionByKey(string key)
+        {
+            GameSession gameSession = _executor.Read<GameSession>($"select * from GameSession where key = '{key}'").FirstOrDefault();
+
+            return gameSession;
+        }
+
         public void InsertGame(GameSession game)
         {
             _executor.Insert(game);
+        }
+
+        public void UpdateGame(GameSession game)
+        {
+            _executor.Update(game);
         }
 
         public List<GameSession> GetRecentGames()
         {
             DateTime dateTime = DateTime.Now.AddMinutes(-60);
 
-            List<GameSession> games = _executor.Read<GameSession>($"select key, DateStarted, DateDisplay from GameSession where DateStarted > '{dateTime.ToString()}'");
+            string query = $@"select key, DateStarted, DateDisplay from 
+                            GameSession where DateStarted > '{dateTime.ToString()}' AND Joined = false";
+
+            List<GameSession> games = _executor.Read<GameSession>(query);
 
             return games;
         }

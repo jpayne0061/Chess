@@ -2,6 +2,18 @@
     box-sizing: border-box;
 }
 
+body {
+    font-family: Calibri;
+}
+
+#main-container {
+    display: block;
+    text-align: center;
+}
+
+#game-container {
+    display: inline-block;
+}
 
 .selected {
     box-shadow: 0px 0px 0px 10px black inset;
@@ -22,6 +34,9 @@
     border-radius: 4px;
     color: white;
     font-weight: 600;
+    width: 90%;
+    margin: auto;
+    font-size: 1.2em;
 }
 
 .btn:hover {
@@ -51,3 +66,16 @@
     padding: 7px;
 }
 
+#game-key-container{
+    font-size: 1.2em;
+}
+
+#messages {
+    text-align: center;
+    font-size: 22px;
+    padding: 20px;
+}
+
+#recently-started-games{
+    margin-top: 5%;
+}

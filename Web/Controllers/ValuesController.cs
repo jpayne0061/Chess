@@ -31,9 +31,20 @@ namespace Web.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public bool IsValidGame(string gameKey)
+        public bool JoinGame(string gameKey)
         {
-            return _gameSessionDal.GameKeyExists(gameKey);
+            GameSession game = _gameSessionDal.GetGameSessionByKey(gameKey);
+
+            if(game == null)
+            {
+                throw new Exception($"No game could be found by this key: {gameKey}");
+            }
+
+            game.Joined = true;
+
+            _gameSessionDal.UpdateGame(game);
+
+            return true;
         }
 
         // GET api/values/5

@@ -22,7 +22,7 @@ var INVALID_PLAY_TYPES = {
     1 : "Out of turn"
 };
 
-var pieceLookup = {
+var PIECE_LOOKUP = {
     "whiterook": "&#9814;",
     "whiteknight": "&#9816;",
     "whitebishop": "&#9815;",
@@ -41,6 +41,8 @@ var globalStart = null;
 var globalEnd = null;
 
 function setUp() {
+    document.getElementById('recently-started-games').style.display = 'none';
+
     connectToHub();
 
     buildBoard();
@@ -50,16 +52,11 @@ function setUp() {
     PLAYER_COLOR = 0;
 }
 
-function joinGame() {
-    var recentGames = getRecentlyStartedGames();
-}
 
 function joinGameByKey(key) {
-    console.log("key? ", key);
+    GAME_ID = key.trim();
 
-    GAME_ID = key;
-
-    checkIfGameIdValid(setUp);
+    joinIfGameIdValid(setUp);
 }
 
 function listRecentlyStartedGames(gamesText) {
@@ -113,6 +110,8 @@ function rotateBoard() {
 function connectToHub() {
     CONNECTION = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
+    console.log("GAME ID USED FORE SYNC: ", GAME_ID);
+
     CONNECTION.on(GAME_ID, function (message) {
         console.log("message from hub: ", message);
 
@@ -160,7 +159,7 @@ function startNewGame() {
     xhttp.onload = function () {
         console.log("post game key response text: ", this.responseText);
 
-        GAME_ID = this.responseText;
+        GAME_ID = this.responseText.trim();
 
         connectToHub();
 
@@ -171,9 +170,9 @@ function startNewGame() {
     };
 }
 
-function checkIfGameIdValid(setUp) {
+function joinIfGameIdValid(setUp) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", URL_ROOT + "/api/values/IsValidGame?gameKey=" + GAME_ID, true);
+    xhttp.open("GET", URL_ROOT + "/api/values/JoinGame?gameKey=" + GAME_ID, true);
     xhttp.send();
 
     xhttp.onload = function () {
@@ -246,18 +245,15 @@ function getBoardWidth() {
 }
 
 function buildBoard() {
-    var boardWidth = getBoardWidth();
-
-    CONTAINER.style.width = boardWidth;
-
     var x = 0;
     var y = 0;
 
-    var containerSize = Math.min(getScreenHeight(), getScreenWidth()) * (getContainerWidthPercent() / 100);
-
-    var squareSize = Math.floor(containerSize / 8);
+    var squareSize = Math.floor(Math.floor(getScreenWidth()) / 9);
 
     var fontSize = Math.floor(squareSize * 0.71); 
+
+    document.getElementById('black-captured-pieces').style.fontSize = fontSize + 'px';
+    document.getElementById('white-captured-pieces').style.fontSize = fontSize + 'px';
 
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
@@ -508,7 +504,7 @@ function movePiece(playResult, command) {
 
         console.log("color: ", color);
 
-        var piece = pieceLookup[color + playResult.CapturedPiece.Name.toLowerCase()];
+        var piece = PIECE_LOOKUP[color + playResult.CapturedPiece.Name.toLowerCase()];
 
         document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece;
     }

@@ -9,6 +9,10 @@ namespace Web.Interfaces
 
         void InsertGame(GameSession game);
 
+        void UpdateGame(GameSession game);
+
         List<GameSession> GetRecentGames();
+
+        GameSession GetGameSessionByKey(string key);
     }
 }

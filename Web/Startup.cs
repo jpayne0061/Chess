@@ -27,6 +27,7 @@ namespace Web
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
 
+            File.WriteAllText("HotSauceDb.hdb", null);
             var executor = Executor.GetInstance();
             executor.CreateTable<PlayResultEntity>();
             executor.CreateTable<GameSession>();
