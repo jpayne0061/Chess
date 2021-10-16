@@ -1,8 +1,6 @@
-﻿using Chess.Models.Enums;
-
-namespace Chess.Models
+﻿namespace Chess.Models
 {
-    public class PlayResult
+    public class PlayResult : PlayResultEntity
     {
         public PlayResult(string message)
         {
@@ -13,13 +11,6 @@ namespace Chess.Models
         {
 
         }
-
-        public string Message { get; set; }
-        public bool PlayValid { get; set; }
         public ChessPiece CapturedPiece { get; set; }
-        public bool IsCheck { get; set; }
-        public bool IsCheckMate { get; set; }
-        public Color Turn { get; set; }
-        public string Command { get; set; }
     }
 }

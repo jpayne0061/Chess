@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Web.Data;
+using Web.Interfaces;
 
 namespace Web
 {
@@ -28,10 +29,10 @@ namespace Web
 
             var executor = Executor.GetInstance();
             executor.CreateTable<PlayResultEntity>();
-            executor.CreateTable<GameKey>();
+            executor.CreateTable<GameSession>();
             services.AddSingleton(executor);
-            services.AddTransient<PlayResultDAL, PlayResultDAL>();
-            services.AddTransient<GameKeyDal, GameKeyDal>();
+            services.AddTransient<IPlayResultDal, PlayResultDal>();
+            services.AddTransient<IGameSessionDal, GameSessionDal>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

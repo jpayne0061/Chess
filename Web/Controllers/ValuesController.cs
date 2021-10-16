@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Chess.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Caching.Memory;
-using Newtonsoft.Json;
-using Web.Data;
+using ChessGame;
+using Web.Services;
+using Web.Interfaces;
+using System;
 
 namespace Web.Controllers
 {
@@ -15,23 +16,24 @@ namespace Web.Controllers
     public class ValuesController : ControllerBase
     {
         IMemoryCache _memoryCache;
-        IHubContext<ChatHub> _hubContext;
-        PlayResultDAL _dal;
-        private GameKeyDal _gameKeyDal;
+        IGameSessionDal _gameSessionDal;
+        GameFlow _gameFlow;
 
-        public ValuesController(IMemoryCache memoryCache, IHubContext<ChatHub> hubContext, PlayResultDAL dal, GameKeyDal gameKeyDal)
+        public ValuesController(IMemoryCache memoryCache, 
+                            IHubContext<ChatHub> hubContext, 
+                            IPlayResultDal playResultDal, 
+                            IGameSessionDal gameSessionDal)
         {
             _memoryCache = memoryCache;
-            _hubContext = hubContext;
-            _dal = dal;
-            _gameKeyDal = gameKeyDal;
+            _gameSessionDal = gameSessionDal;
+            _gameFlow = new GameFlow(hubContext, playResultDal, gameSessionDal);
         }
 
-        [HttpGet("{gameKey}")]
+        [HttpGet]
         [Route("[action]")]
-        public bool ValidGame(string gameKey)
+        public bool IsValidGame(string gameKey)
         {
-            return _gameKeyDal.GameKeyExists(gameKey);
+            return _gameSessionDal.GameKeyExists(gameKey);
         }
 
         // GET api/values/5
@@ -42,85 +44,37 @@ namespace Web.Controllers
 
             string gameId = splitCommand[2];
 
-            RuleMaster.RuleMaster ruleMaster = (RuleMaster.RuleMaster)_memoryCache.Get(gameId);
+            Game ruleMaster = (Game)_memoryCache.Get(gameId);
 
-            int fromY = int.Parse(splitCommand[0][0].ToString());
-            int fromX = int.Parse(splitCommand[0][1].ToString());
-
-            int toY = int.Parse(splitCommand[1][0].ToString());
-            int toX = int.Parse(splitCommand[1][1].ToString());
-
-            PlayResult pr = ruleMaster.MakeMove(new Location(fromX, fromY), new Location(toX, toY));
-
-            if(pr.PlayValid)
-            {
-                pr.Command = command;
-                await _hubContext.Clients.All.SendAsync(gameId, pr);
-            }
-
-            _dal.SavePlayResult(pr);
-
-            return JsonConvert.SerializeObject(pr);
+            return await _gameFlow.MakeMove(command, ruleMaster);
         }
 
 
         // POST api/values
         [HttpGet]
         [Route("[action]")]
-        public string SetGame()
+        public string CreateGame()
         {
-            string gameKey = GenerateGameKey();
+            string gameKey = _gameFlow.CreateGame();
 
-            while(_gameKeyDal.GameKeyExists(gameKey))
-            {
-                gameKey = GenerateGameKey();
-            }
-
-            _gameKeyDal.InsertGameKey(gameKey);
-
-            _memoryCache.Set(gameKey, new RuleMaster.RuleMaster());
+            _memoryCache.Set(gameKey, new Game());
 
             return gameKey;
         }
 
-        private string GenerateGameKey()
+        // POST api/values
+        [HttpGet]
+        [Route("[action]")]
+        public List<GameSession> GetRecentGames()
         {
-            Random random = new Random();
+            List<GameSession> games = _gameSessionDal.GetRecentGames();
 
-            List<string> adjectives = new List<string>
+            foreach (var game in games)
             {
-                "silly",
-                "quiet",
-                "funny",
-                "loud",
-                "small",
-                "big",
-                "green",
-                "jumpy",
-                "slippery",
-                "tiny",
-                "little"
-            };
+                game.DateDisplay = Math.Abs(Math.Floor((DateTime.Now - game.DateStarted).TotalMinutes)).ToString() + " minutes ago";
+            }
 
-            List<string> nouns = new List<string>
-            {
-                "dog",
-                "cat",
-                "rhino",
-                "fish",
-                "bird",
-                "snake",
-                "turtle",
-                "dragon",
-                "panda",
-                "dino"
-            };
-
-            var adjective = adjectives[random.Next(0, adjectives.Count)];
-            var noun = nouns[random.Next(0, nouns.Count)];
-
-            return adjective + noun + random.Next(0, 100).ToString();
+            return games;
         }
-
     }
 }

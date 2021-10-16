@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Chess.Models
 {
@@ -16,7 +15,7 @@ namespace Chess.Models
             PlayValid = playResult.PlayValid;
             IsCheck = playResult.IsCheck;
             IsCheckMate = playResult.IsCheckMate;
-            Turn = playResult.Turn == Enums.Color.White ? 1 : 0;
+            Turn = playResult.Turn == (int)Enums.Color.White ? 1 : 0;
             Command = playResult.Command;
         }
 

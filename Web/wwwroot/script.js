@@ -1,4 +1,4 @@
-﻿if (window.location.href.indexOf('localhost')) {
+﻿if (window.location.href.indexOf('localhost') > -1) {
     URL_ROOT = 'https://localhost:44320';
 }
 else {
@@ -7,9 +7,9 @@ else {
 
 var GAME_ID = "";
 
-var connection = null;
+var CONNECTION = null;
 
-var container = document.getElementById('game-container');
+var CONTAINER = document.getElementById('game-container');
 
 var CHECK_MATE = false;
 
@@ -51,12 +51,36 @@ function setUp() {
 }
 
 function joinGame() {
+    var recentGames = getRecentlyStartedGames();
+}
 
-    GAME_ID = document.getElementById('join-game').value;
+function joinGameByKey(key) {
+    console.log("key? ", key);
+
+    GAME_ID = key;
 
     checkIfGameIdValid(setUp);
 }
 
+function listRecentlyStartedGames(gamesText) {
+
+    var games = JSON.parse(gamesText);
+
+    console.log(games);
+
+    var gameDisplay = document.getElementById('recently-started-games');
+
+    for (var i = 0; i < games.length; i++) {
+        var node = document.createElement('div');
+
+        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"  data-attr="' + node.key + '">' +
+            '<strong>' + games[i].key + '</strong><br> Started ' + games[i].dateDisplay + '</div>';
+
+        node.classList.add('gameListing');
+
+        gameDisplay.appendChild(node);
+    }
+}
 
 
 function startGame() {
@@ -76,20 +100,20 @@ function startGame() {
 }
 
 function rotateBoard() {
-    container.classList.add("rotated");
+    CONTAINER.classList.add('rotated');
 
-    var pieces = container.children;
+    var pieces = CONTAINER.children;
 
     for (var i = 0; i < pieces.length; i++) {
-        pieces[i].classList.add("rotated");
+        pieces[i].classList.add('rotated');
     }
 
 }
 
 function connectToHub() {
-    connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
+    CONNECTION = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-    connection.on(GAME_ID, function (message) {
+    CONNECTION.on(GAME_ID, function (message) {
         console.log("message from hub: ", message);
 
         var command = message.command;
@@ -108,7 +132,7 @@ function connectToHub() {
         movePiece(message, command);
     });
 
-    connection.start();
+    CONNECTION.start();
 }
 
 function hideGameInputs() {
@@ -118,7 +142,7 @@ function hideGameInputs() {
 function restartGame() {
     CHECK_MATE = false;
 
-    container.innerHTML = '';
+    CONTAINER.innerHTML = '';
     document.getElementById('white-captured-pieces').innerHTML = '';
     document.getElementById('black-captured-pieces').innerHTML = '';
 
@@ -130,7 +154,7 @@ function restartGame() {
 
 function startNewGame() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", URL_ROOT + "/api/values/SetGame", true);
+    xhttp.open("GET", URL_ROOT + "/api/values/CreateGame", true);
     xhttp.send();
 
     xhttp.onload = function () {
@@ -149,7 +173,7 @@ function startNewGame() {
 
 function checkIfGameIdValid(setUp) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", URL_ROOT + "/api/GameState/" + GAME_ID, true);
+    xhttp.open("GET", URL_ROOT + "/api/values/IsValidGame?gameKey=" + GAME_ID, true);
     xhttp.send();
 
     xhttp.onload = function () {
@@ -165,10 +189,75 @@ function checkIfGameIdValid(setUp) {
     };
 }
 
+function getRecentlyStartedGames() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", URL_ROOT + "/api/values/GetRecentGames", true);
+    xhttp.send();
+
+    xhttp.onload = function () {
+        console.log("recent games: ", this.responseText);
+
+        listRecentlyStartedGames(this.responseText);
+    };
+}
+
+function getScreenWidth() {
+    return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+}
+
+function getScreenHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+}
+
+function getContainerWidthPercent() {
+    var width = getScreenWidth();
+
+    var containerWidthPercent = 0;
+
+    if (width > 1400) {
+        containerWidthPercent = 70;
+    }
+    else if (width > 1215) {
+        containerWidthPercent = 75;
+    }
+    else if (width > 1100) {
+        containerWidthPercent = 78;
+    }
+    else if (width > 1000) {
+        containerWidthPercent = 85;
+    }
+    else if (width > 900) {
+        containerWidthPercent = 88;
+    }
+    else if (width > 800) {
+        containerWidthPercent = 92;
+    }
+    else if (width <= 800) {
+        containerWidthPercent = 95;
+    }
+
+    return containerWidthPercent;
+}
+
+function getBoardWidth() {
+    var containerWidth = getContainerWidthPercent();
+
+    return containerWidth + '%';
+}
 
 function buildBoard() {
+    var boardWidth = getBoardWidth();
+
+    CONTAINER.style.width = boardWidth;
+
     var x = 0;
     var y = 0;
+
+    var containerSize = Math.min(getScreenHeight(), getScreenWidth()) * (getContainerWidthPercent() / 100);
+
+    var squareSize = Math.floor(containerSize / 8);
+
+    var fontSize = Math.floor(squareSize * 0.71); 
 
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
@@ -288,14 +377,14 @@ function buildBoard() {
             }
 
             node.style.backgroundColor = x % 2 === 0 ? '#adadad' : '#666666';
-            node.style.height = '48px';
-            node.style.width = '48px';
-            node.style.fontSize = '34px';
+            node.style.height = squareSize + 'px';
+            node.style.width = squareSize + 'px';
+            node.style.fontSize = fontSize + 'px';
             node.style.paddingLeft = '6px';
             node.style.display = 'inline-block';
             node.onclick = getCoordinates;
 
-            container.appendChild(node);
+            CONTAINER.appendChild(node);
             x++;
         }
 
@@ -303,7 +392,7 @@ function buildBoard() {
         y++;
 
         var breakNode = document.createElement("div");
-        container.appendChild(breakNode);
+        CONTAINER.appendChild(breakNode);
     }
 }
 
@@ -332,8 +421,6 @@ function getCoordinates(e) {
     giveBorder(e);
 
     if (globalStart === null) {
-
-
         globalStart = { x: x, y: y };
         return;
     }

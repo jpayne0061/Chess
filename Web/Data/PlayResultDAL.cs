@@ -1,14 +1,15 @@
 ﻿using Chess.Models;
 using HotSauceDbOrm;
+using Web.Interfaces;
 
 namespace Web.Data
 { 
 
-    public class PlayResultDAL
+    public class PlayResultDal : IPlayResultDal
     {
         private readonly Executor _executor;
 
-        public PlayResultDAL(Executor executor)
+        public PlayResultDal(Executor executor)
         {
             _executor = executor;
         }

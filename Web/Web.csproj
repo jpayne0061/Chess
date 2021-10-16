@@ -5,15 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotSauceDbOrm" Version="1.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\HotSauceDB\HotSauceDBOrm\HotSauceDbOrm.csproj" />
     <ProjectReference Include="..\Chess.Models\Chess.Models.csproj" />
-    <ProjectReference Include="..\RuleMaster\RuleMaster.csproj" />
+    <ProjectReference Include="..\RuleMaster\Chess.Game.csproj" />
   </ItemGroup>
 
 </Project>

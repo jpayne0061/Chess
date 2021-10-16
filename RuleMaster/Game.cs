@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RuleMaster
+namespace ChessGame
 {
-    public class RuleMaster
+    public class Game
     {
         bool _whitesTurn = true;
         HashSet<ChessPiece> _chessPieces;
@@ -21,7 +21,7 @@ namespace RuleMaster
         }
 
 
-        public RuleMaster()
+        public Game()
         {
             var chessPieces = new HashSet<ChessPiece>();
 
@@ -133,7 +133,7 @@ namespace RuleMaster
             {
                 chessPiece.IsFirstMove = false;
                 _whitesTurn = !_whitesTurn;
-                playResult.Turn = _whitesTurn ? Color.White : Color.Black;
+                playResult.Turn = _whitesTurn ? (int)Color.White : (int)Color.Black;
 
                 var piecesThatCanCaptureKing = IsInCheck(GetCurrentPlayer);
 

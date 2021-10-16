@@ -13,7 +13,6 @@ namespace Chess.Models
         }
         public string Name { get; set; }
         public Location CurrentLocation { get; set; }
-
         public bool IsFirstMove { get; set; }
     }
 

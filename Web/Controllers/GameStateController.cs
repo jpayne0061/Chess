@@ -7,9 +7,9 @@ namespace Web.Controllers
     [ApiController]
     public class GameStateController : ControllerBase
     {
-        private readonly GameKeyDal _gameKeyDal;
+        private readonly GameSessionDal _gameKeyDal;
 
-        public GameStateController(GameKeyDal gameKeyDal)
+        public GameStateController(GameSessionDal gameKeyDal)
         {
             _gameKeyDal = gameKeyDal;
         }
