@@ -350,31 +350,31 @@ function buildBoard() {
                     node.innerHTML = "&#9820;";
                     break;
                 case "60":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "61":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "62":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "63":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "64":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "65":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "66":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 case "67":
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     break;
                 default:
-                    node.innerHTML = "&#9823;";
+                    node.innerHTML = "&#9823;&#xFE0E";
                     node.style.color = x % 2 === 0 ? '#adadad' : '#666666';
             }
 
@@ -498,7 +498,7 @@ function movePiece(playResult, command) {
 
 
     var elTo = document.getElementById(end);
-    elTo.innerHTML = character;
+    elTo.innerHTML = character + '&#xFE0E';
 
     if (character.charCodeAt(0) <= 9817) {
         elTo.style.color = "#ebebeb";
@@ -522,7 +522,7 @@ function movePiece(playResult, command) {
 
         var piece = PIECE_LOOKUP[color + playResult.CapturedPiece.Name.toLowerCase()];
 
-        document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece;
+        document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece + '&#xFE0E';
     }
 }
 
