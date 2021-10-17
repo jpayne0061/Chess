@@ -42,6 +42,10 @@ var PIECE_LOOKUP = {
 var globalStart = null;
 var globalEnd = null;
 
+function writeMessage(message) {
+    document.getElementById('messages').innerHTML = message;
+}
+
 function setUp() {
     OTHER_PLAYER_HAS_JOINED = true;
 
@@ -74,13 +78,15 @@ function listRecentlyStartedGames(gamesText) {
     for (var i = 0; i < games.length; i++) {
         var node = document.createElement('div');
 
-        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"  data-attr="' + node.key + '">' +
+        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"'  +
             '<strong>' + games[i].key + '</strong><br> Started ' + games[i].dateDisplay + '</div>';
 
         node.classList.add('gameListing');
 
         gameDisplay.appendChild(node);
     }
+
+    writeMessage('')
 }
 
 
@@ -97,7 +103,7 @@ function startGame() {
 
     YOUR_TURN = true;
 
-    document.getElementById('messages').innerHTML = 'it is your turn';
+    writeMessage('it is your turn');
 }
 
 function rotateBoard() {
@@ -129,13 +135,16 @@ function connectToHub() {
 
         if (message.isCheckMate) {
             CHECK_MATE = true;
-            document.getElementById('messages').innerHTML = 'check mate';
+            writeMessage('check mate');
+        }
+        else if (message.turn === PLAYER_COLOR && message.isCheck) {
+            writeMessage('it is your turn. you are in check');
         }
         else if (message.turn === PLAYER_COLOR) {
-            document.getElementById('messages').innerHTML = 'it is your turn';
+            writeMessage('it is your turn');
         }
         else if (message.isCheck) {
-            document.getElementById('messages').innerHTML = 'check';
+            writeMessage('check');
         }
 
         movePiece(message, command);
@@ -177,6 +186,7 @@ function startNewGame() {
 
         document.getElementById('game-key').innerHTML = GAME_ID;
         document.getElementById('game-key-container').style.display = 'block';
+        document.getElementById('recently-started-games').style.display = 'none';
     };
 }
 
@@ -206,6 +216,11 @@ function getRecentlyStartedGames() {
     xhttp.onload = function () {
         console.log("recent games: ", this.responseText);
 
+        if (this.responseText.length <= 5) {
+            writeMessage('there are currently no games to join');
+            return;
+        }
+
         listRecentlyStartedGames(this.responseText);
     };
 }
@@ -218,47 +233,13 @@ function getScreenHeight() {
     return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 }
 
-function getContainerWidthPercent() {
-    var width = getScreenWidth();
-
-    var containerWidthPercent = 0;
-
-    if (width > 1400) {
-        containerWidthPercent = 70;
-    }
-    else if (width > 1215) {
-        containerWidthPercent = 75;
-    }
-    else if (width > 1100) {
-        containerWidthPercent = 78;
-    }
-    else if (width > 1000) {
-        containerWidthPercent = 85;
-    }
-    else if (width > 900) {
-        containerWidthPercent = 88;
-    }
-    else if (width > 800) {
-        containerWidthPercent = 92;
-    }
-    else if (width <= 800) {
-        containerWidthPercent = 95;
-    }
-
-    return containerWidthPercent;
-}
-
-function getBoardWidth() {
-    var containerWidth = getContainerWidthPercent();
-
-    return containerWidth + '%';
-}
-
 function buildBoard() {
     var x = 0;
     var y = 0;
 
-    var squareSize = Math.floor(Math.floor(getScreenWidth()) / 9);
+    var gameBoardWidth = getScreenWidth() > 1000 ? getScreenWidth() * 0.50 : getScreenWidth();
+
+    var squareSize = Math.floor(Math.floor(gameBoardWidth) / 9);
 
     var fontSize = Math.floor(squareSize * 0.71); 
 

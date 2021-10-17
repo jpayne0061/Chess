@@ -15,6 +15,10 @@ body {
     display: inline-block;
 }
 
+#game-container:hover {
+    cursor: pointer;
+}
+
 .selected {
     box-shadow: 0px 0px 0px 10px black inset;
 }
@@ -23,41 +27,32 @@ body {
     transform: rotate(180deg);
 }
 
-.center {
-    /*margin: auto;*/
-    /*display: inline-block;*/
-}
-
 .btn {
     padding: 30px;
     border: none;
     border-radius: 4px;
-    color: white;
     font-weight: 600;
     width: 90%;
     margin: auto;
     font-size: 2.2em;
+    margin-bottom: 15px;
 }
 
 .btn:hover {
     cursor: pointer;
 }
 
-.green {
-    background-color: #32a852;
+.black {
+    background-color: #575757;
+    color: #fff;
 }
 
-.blue {
-    background-color: #3283a8;
+.white {
+    background-color: #fff;
+    border: 3px solid #575757;
+    color: #575757;
 }
 
-.blue:hover {
-    background-color: #266582;
-}
-
-.green:hover {
-    background-color: #227d3a;
-}
 
 .gameListing {
     border: 3px solid #949494;
@@ -78,4 +73,26 @@ body {
 
 #recently-started-games{
     margin-top: 5%;
+}
+
+#header {
+    text-align: center;
+    color: #575757;
+    font-size: 3.8em;
+}
+
+#recently-started-games {
+    padding: 5%;
+    font-size: 2em;
+}
+
+#recently-started-games:hover {
+    cursor: pointer;
+}
+
+
+@media screen and (min-width: 1000px) {
+    #game-container {
+        max-width: 50%;
+    }
 }
