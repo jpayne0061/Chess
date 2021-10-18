@@ -22,7 +22,7 @@ namespace Web.Services
             _playResultDal = playResultDal;
         }
 
-        public async Task<string> MakeMove(string command, Game game)
+        public async Task<PlayResult> MakeMove(string command, Game game)
         {
             string[] commandParts = command.Split(' ');
 
@@ -44,7 +44,14 @@ namespace Web.Services
 
             _playResultDal.SavePlayResult(pr);
 
-            return JsonConvert.SerializeObject(pr);
+            return pr;
+        }
+
+        public async Task PromotePawn(PawnPromotion pawnPromotion, Game game)
+        {
+            game.PromotePawn(pawnPromotion);
+
+            await _hubContext.Clients.All.SendAsync(pawnPromotion.GameKey, pawnPromotion);
         }
 
         public string CreateGame()

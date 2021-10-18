@@ -12,5 +12,6 @@
 
         }
         public ChessPiece CapturedPiece { get; set; }
+        public Location EndLocation { get; set; }
     }
 }

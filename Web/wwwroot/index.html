@@ -4,16 +4,19 @@
 <head>
     <meta charset="utf-8" />
     <title>Chess</title>
+    <link rel="shortcut icon" type="image/jpg" href="favicon.ico" />
     <link rel="stylesheet" href="style3.css">
 </head>
 <body>
     <div id="main-container">
         <div id="header"><h1>Chess</h1></div>
-        <div id="game-key-container" style=" display: none">Game Key: <span id="game-key"></span></div>
-        <div id="black-captured-pieces" style="font-size: 38px;"></div>
+        <div id="game-key-container">
+            Game Key: <span id="game-key"></span>
+        </div>
+        <div id="black-captured-pieces" style=""></div>
         <div id="game-container"></div>
         <div id="messages"></div>
-        <div id="white-captured-pieces" style="font-size: 38px; height: 51px"></div>
+        <div id="white-captured-pieces"></div>
 
         <button id="restart-game" onclick="restartGame()" style="display: none">New Game</button>
 
@@ -21,7 +24,6 @@
             <button onclick="startGame()" class="btn black">Start Game</button>
             <button onclick="getRecentlyStartedGames()" class="btn white">Join Game</button>
         </div>
-
         <div id="recently-started-games"></div>
 
     </div>

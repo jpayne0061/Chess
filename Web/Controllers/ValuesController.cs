@@ -49,19 +49,28 @@ namespace Web.Controllers
             return true;
         }
 
+        [HttpPost]
+        public async Task<PawnPromotion> ChoosePawnPromotion([FromBody] PawnPromotion pawnPromotion)
+        {
+            Game game = (Game)_memoryCache.Get(pawnPromotion.GameKey);
+
+            await _gameFlow.PromotePawn(pawnPromotion, game);
+
+            return pawnPromotion;
+        }
+
         // GET api/values/5
         [HttpGet("{command}")]
-        public async Task<string> MakeMove(string command)
+        public async Task<PlayResult> MakeMove(string command)
         {
             string[] splitCommand = command.Split(' ');
 
             string gameId = splitCommand[2];
 
-            Game ruleMaster = (Game)_memoryCache.Get(gameId);
+            Game game = (Game)_memoryCache.Get(gameId);
 
-            return await _gameFlow.MakeMove(command, ruleMaster);
+            return await _gameFlow.MakeMove(command, game);
         }
-
 
         // POST api/values
         [HttpGet]

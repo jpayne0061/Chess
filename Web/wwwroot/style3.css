@@ -63,6 +63,7 @@ body {
 
 #game-key-container{
     font-size: 1.4em;
+    display: none;
 }
 
 #messages {
@@ -90,6 +91,11 @@ body {
     cursor: pointer;
 }
 
+#black-captured-pieces,
+#white-captured-pieces {
+    overflow-wrap: break-word;
+    font-size: 38px;
+}
 
 @media screen and (min-width: 1000px) {
     #game-container {

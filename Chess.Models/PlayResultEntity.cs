@@ -24,8 +24,9 @@ namespace Chess.Models
         public bool PlayValid { get; set; }
         public bool IsCheck { get; set; }
         public bool IsCheckMate { get; set; }
+        public bool IsEligibleForPawnPromotion { get; set; }
         public int Turn { get; set; }
-        [StringLength(10)]
+        [StringLength(25)]
         public string Command { get; set; }
 
 

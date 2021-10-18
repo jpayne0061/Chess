@@ -12,7 +12,7 @@ namespace ChessGame
         bool _whitesTurn = true;
         HashSet<ChessPiece> _chessPieces;
 
-        public Color GetCurrentPlayer
+        private Color GetCurrentPlayerColor
         {
             get
             {
@@ -20,19 +20,26 @@ namespace ChessGame
             }
         }
 
+        private Color GetOtherPlayerColor
+        {
+            get
+            {
+                return _whitesTurn ? Color.Black :  Color.White;
+            }
+        }
 
         public Game()
         {
             var chessPieces = new HashSet<ChessPiece>();
 
-            chessPieces.Add(new Rook(0, 0, Color.White));
+            chessPieces.Add(new Rook  (0, 0, Color.White));
             chessPieces.Add(new Knight(1, 0, Color.White));
             chessPieces.Add(new Bishop(2, 0, Color.White));
-            chessPieces.Add(new King(3, 0, Color.White));
-            chessPieces.Add(new Queen(4, 0, Color.White));
+            chessPieces.Add(new King  (3, 0, Color.White));
+            chessPieces.Add(new Queen (4, 0, Color.White));
             chessPieces.Add(new Bishop(5, 0, Color.White));
             chessPieces.Add(new Knight(6, 0, Color.White));
-            chessPieces.Add(new Rook(7, 0, Color.White));
+            chessPieces.Add(new Rook  (7, 0, Color.White));
 
             chessPieces.Add(new Pawn(0, 1, Color.White));
             chessPieces.Add(new Pawn(1, 1, Color.White));
@@ -44,14 +51,14 @@ namespace ChessGame
             chessPieces.Add(new Pawn(7, 1, Color.White));
 
 
-            chessPieces.Add(new Rook(0, 7, Color.Black));
+            chessPieces.Add(new Rook  (0, 7, Color.Black));
             chessPieces.Add(new Knight(1, 7, Color.Black));
             chessPieces.Add(new Bishop(2, 7, Color.Black));
-            chessPieces.Add(new King(3, 7, Color.Black));
-            chessPieces.Add(new Queen(4, 7, Color.Black));
+            chessPieces.Add(new King  (3, 7, Color.Black));
+            chessPieces.Add(new Queen (4, 7, Color.Black));
             chessPieces.Add(new Bishop(5, 7, Color.Black));
             chessPieces.Add(new Knight(6, 7, Color.Black));
-            chessPieces.Add(new Rook(7, 7, Color.Black));
+            chessPieces.Add(new Rook  (7, 7, Color.Black));
 
             chessPieces.Add(new Pawn(0, 6, Color.Black));
             chessPieces.Add(new Pawn(1, 6, Color.Black));
@@ -77,9 +84,9 @@ namespace ChessGame
                 return nonValidSpace;
             }
 
-            if(GetCurrentPlayer != chessPiece.Color)
+            if(GetCurrentPlayerColor != chessPiece.Color)
             {
-                var wrongPlayer = new PlayResult($"It is {GetCurrentPlayer}'s turn");
+                var wrongPlayer = new PlayResult($"It is {GetCurrentPlayerColor}'s turn");
 
                 wrongPlayer.PlayValid = false;
                 return wrongPlayer;
@@ -87,7 +94,7 @@ namespace ChessGame
 
             Location oldLocation = new Location(chessPiece.CurrentLocation.X, chessPiece.CurrentLocation.Y);
 
-            bool playerIsInCheckBeforeMove = IsInCheck(GetCurrentPlayer).Any();
+            bool playerIsInCheckBeforeMove = PiecesThatCanCaptureKing(GetCurrentPlayerColor).Any();
 
             var availableLocations = GetAvailableMoves(chessPiece);
 
@@ -114,7 +121,7 @@ namespace ChessGame
 
             chessPiece.CurrentLocation = proposedLocation;
 
-            bool playerIsInCheckAfterMove = IsInCheck(GetCurrentPlayer).Any();
+            bool playerIsInCheckAfterMove = PiecesThatCanCaptureKing(GetCurrentPlayerColor).Any();
 
             if (playerIsInCheckAfterMove)
             {
@@ -128,23 +135,77 @@ namespace ChessGame
             }
 
             playResult.PlayValid = true;
+            playResult.EndLocation = proposedLocation;
 
-            if(playResult.PlayValid)
+
+            var piecesThatCanCaptureKing = PiecesThatCanCaptureKing(GetOtherPlayerColor);
+            playResult.IsCheck = piecesThatCanCaptureKing.Any();
+            playResult.IsCheckMate = playResult.IsCheck ? IsCheckMate(GetOtherPlayerColor, piecesThatCanCaptureKing) : false;
+            chessPiece.IsFirstMove = false;
+
+            if (playResult.PlayValid && IsEligibleForPawnPromotion(chessPiece, proposedLocation))
             {
-                chessPiece.IsFirstMove = false;
-                _whitesTurn = !_whitesTurn;
+                playResult.IsEligibleForPawnPromotion = true;
                 playResult.Turn = _whitesTurn ? (int)Color.White : (int)Color.Black;
 
-                var piecesThatCanCaptureKing = IsInCheck(GetCurrentPlayer);
-
-                playResult.IsCheck = piecesThatCanCaptureKing.Any();
-                playResult.IsCheckMate = playResult.IsCheck ? IsCheckMate(GetCurrentPlayer, piecesThatCanCaptureKing): false;
+            }
+            else if (playResult.PlayValid)
+            {
+                _whitesTurn = !_whitesTurn;
+                playResult.Turn = _whitesTurn ? (int)Color.White : (int)Color.Black;
             }
 
             return playResult;
         }
 
-        public HashSet<ChessPiece> IsInCheck(Color color)
+        public void PromotePawn(PawnPromotion pawnPromotion)
+        {
+            ChessPiece chessPiece;
+
+            Color color = _whitesTurn ? Color.White : Color.Black;
+
+            switch (pawnPromotion.PieceName)
+            {
+                case "Rook":
+                    chessPiece = new Rook(pawnPromotion.Location.X, pawnPromotion.Location.Y, color);
+                    break;
+                case "Knight":
+                    chessPiece = new Knight(pawnPromotion.Location.X, pawnPromotion.Location.Y, color);
+                    break;
+                case "Bishop":
+                    chessPiece = new Bishop(pawnPromotion.Location.X, pawnPromotion.Location.Y, color);
+                    break;
+                case "Queen":
+                    chessPiece = new Queen(pawnPromotion.Location.X, pawnPromotion.Location.Y, color);
+                    break;
+                default:
+                    chessPiece = new Queen(pawnPromotion.Location.X, pawnPromotion.Location.Y, color);
+                    break;
+            }
+
+            _chessPieces.Add(chessPiece);
+
+            _whitesTurn = !_whitesTurn;
+
+            pawnPromotion.Turn = _whitesTurn ? 1 : 0;
+        }
+
+        public bool IsEligibleForPawnPromotion(ChessPiece chessPiece, Location proposedLocation)
+        {
+            if(chessPiece is Pawn && chessPiece.Color == Color.Black && proposedLocation.Y == 0)
+            {
+                return true;
+            }
+
+            if (chessPiece is Pawn && chessPiece.Color == Color.White && proposedLocation.Y == 7)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public HashSet<ChessPiece> PiecesThatCanCaptureKing(Color color)
         {
             ChessPiece king = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 

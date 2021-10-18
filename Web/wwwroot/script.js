@@ -79,14 +79,16 @@ function listRecentlyStartedGames(gamesText) {
         var node = document.createElement('div');
 
         node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"'  +
-            '<strong>' + games[i].key + '</strong><br> Started ' + games[i].dateDisplay + '</div>';
+                            '<strong>' + games[i].key + '</strong>' +
+                            '<br> Started ' + games[i].dateDisplay +
+                          '</div>';
 
         node.classList.add('gameListing');
 
         gameDisplay.appendChild(node);
     }
 
-    writeMessage('')
+    writeMessage('');
 }
 
 
@@ -120,10 +122,16 @@ function rotateBoard() {
 function connectToHub() {
     CONNECTION = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 
-    console.log("GAME ID USED FORE SYNC: ", GAME_ID);
+    console.log("GAME ID USED FOR SYNC: ", GAME_ID);
 
     CONNECTION.on(GAME_ID, function (message) {
         console.log("message from hub: ", message);
+
+        if (message.pieceName && message.turn === PLAYER_COLOR) {
+            writeMessage('other player has promoted their pawn to ' + message.pieceName + '. It is your turn');
+            movePiece(message.message, message.command, message.pieceName);
+            return;
+        }
 
         if (message === 'player-joined') {
             OTHER_PLAYER_HAS_JOINED = true;
@@ -133,7 +141,7 @@ function connectToHub() {
 
         var command = message.command;
 
-        if (message.isCheckMate) {
+        if (message.isCheckMate) {0
             CHECK_MATE = true;
             writeMessage('check mate');
         }
@@ -147,7 +155,32 @@ function connectToHub() {
             writeMessage('check');
         }
 
-        movePiece(message, command);
+        if (message.turn === PLAYER_COLOR && message.isEligibleForPawnPromotion) {
+            var choice = prompt('enter piece name for promotion');
+
+            var pawnPromotionObject = {};
+
+            pawnPromotionObject.location = { x: message.endLocation.x, y: message.endLocation.y };
+            pawnPromotionObject.pieceName = choice;
+            pawnPromotionObject.gameKey = GAME_ID;
+            pawnPromotionObject.message = message;
+            pawnPromotionObject.command = command;
+
+            console.log('pawnPromotionObject to post', pawnPromotionObject);
+
+            sendPawnPromotionRequest(pawnPromotionObject);
+
+            return;
+        }
+
+        if (message.turn !== PLAYER_COLOR && message.isEligibleForPawnPromotion) {
+            writeMessage('other player is choosing piece for pawn promotion');
+            return;
+        }
+
+        if (message.turn === PLAYER_COLOR) {
+            movePiece(message, command);
+        }
     });
 
     CONNECTION.start();
@@ -391,9 +424,6 @@ function getCoordinates(e) {
         alert('you must wait for other player to join game');
         return;
     }
-    
-
-    console.log("e: ", e);
 
     if (CHECK_MATE) {
         alert("Game has ended in check mate.");
@@ -435,12 +465,12 @@ function getCoordinates(e) {
 
         xhttp.onload = function () {
             var playResult = JSON.parse(this.responseText);
-            console.log(playResult);
+            console.log('playResult from getCoordinates: ', playResult);
 
-            document.getElementById("messages").innerHTML = playResult.Message;
+            document.getElementById("messages").innerHTML = playResult.message;
 
-            if (playResult.IsCheck) {
-                if (playResult.IsCheckMate) {
+            if (playResult.isCheck) {
+                if (playResult.isCheckMate) {
                     alert("Check mate");
                     CHECK_MATE = true;
                     document.getElementById("restart-game").style.display = "block";
@@ -448,11 +478,9 @@ function getCoordinates(e) {
                 else {
                     document.getElementById("messages").innerHTML = "Check";
                 }
-
             }
 
-
-            if (playResult.PlayValid) {
+            if (playResult.playValid) {
                 movePiece(playResult, move);
             }
             else {
@@ -465,7 +493,22 @@ function getCoordinates(e) {
     }
 }
 
-function movePiece(playResult, command) {
+function sendPawnPromotionRequest(pawnPromotionObject) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", URL_ROOT + "/api/values/", true);
+    xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            console.log("result from promotion post", this.responseText);
+            var pawnPromotionObject = JSON.parse(this.responseText);
+            movePiece(pawnPromotionObject.message, pawnPromotionObject.command, pawnPromotionObject.pieceName);
+        }
+    };
+
+    xhttp.send(JSON.stringify(pawnPromotionObject));
+}
+
+function movePiece(playResult, command, overridePieceName) {
 
     cmdArgs = command.split(' ');
     start = cmdArgs[0];
@@ -480,6 +523,14 @@ function movePiece(playResult, command) {
 
     var elTo = document.getElementById(end);
     elTo.innerHTML = character + '&#xFE0E';
+
+    if (overridePieceName) {
+        console.log('play result from promotion object: ', playResult);
+
+        var pieceColor = playResult.turn === 1 ? "white" : "black";
+
+        elTo.innerHTML = PIECE_LOOKUP[pieceColor + overridePieceName.toLowerCase()] + '&#xFE0E';
+    }
 
     if (character.charCodeAt(0) <= 9817) {
         elTo.style.color = "#ebebeb";
@@ -496,12 +547,12 @@ function movePiece(playResult, command) {
     globalStart = null;
     globalEnd = null;
 
-    if (playResult.CapturedPiece !== null) {
-        var color = playResult.CapturedPiece.Color === 0 ? "black" : "white";
+    if (playResult.capturedPiece !== null) {
+        var color = playResult.capturedPiece.color === 0 ? "black" : "white";
 
         console.log("color: ", color);
 
-        var piece = PIECE_LOOKUP[color + playResult.CapturedPiece.Name.toLowerCase()];
+        var piece = PIECE_LOOKUP[color + playResult.capturedPiece.name.toLowerCase()];
 
         document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece + '&#xFE0E';
     }
