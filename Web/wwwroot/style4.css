@@ -102,3 +102,10 @@ body {
         max-width: 50%;
     }
 }
+
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(180deg);
+        transform: rotate(180deg);
+    }
+}

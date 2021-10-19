@@ -105,19 +105,24 @@ function startGame() {
 
     YOUR_TURN = true;
 
-    writeMessage('it is your turn');
+    setTimeout(writeMessage, 1700, 'it is your turn');
 }
 
 function rotateBoard() {
     CONTAINER.classList.add('rotated');
 
+    setTimeout(rotatePieces, 1500);
+}
+
+function rotatePieces() {
     var pieces = CONTAINER.children;
 
     for (var i = 0; i < pieces.length; i++) {
-        pieces[i].classList.add('rotated');
+        pieces[i].style.animation = 'spin 1s forwards';
+        //pieces[i].classList.add('rotated');
     }
-
 }
+
 
 function connectToHub() {
     CONNECTION = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
@@ -141,7 +146,7 @@ function connectToHub() {
 
         var command = message.command;
 
-        if (message.isCheckMate) {0
+        if (message.isCheckMate) {
             CHECK_MATE = true;
             writeMessage('check mate');
         }
@@ -202,6 +207,11 @@ function restartGame() {
     startNewGame();
 }
 
+function showGameKey() {
+    document.getElementById('game-key').innerHTML = GAME_ID;
+    document.getElementById('game-key-container').style.display = 'block';
+}
+
 
 function startNewGame() {
     var xhttp = new XMLHttpRequest();
@@ -215,13 +225,11 @@ function startNewGame() {
 
         connectToHub();
 
-        alert('Your game key is ' + GAME_ID);
-
-        document.getElementById('game-key').innerHTML = GAME_ID;
-        document.getElementById('game-key-container').style.display = 'block';
+        setTimeout(showGameKey, 1700);
         document.getElementById('recently-started-games').style.display = 'none';
     };
 }
+
 
 function joinIfGameIdValid(setUp) {
     var xhttp = new XMLHttpRequest();
@@ -404,7 +412,10 @@ function buildBoard() {
             node.style.display = 'inline-block';
             node.onclick = getCoordinates;
 
-            CONTAINER.appendChild(node);
+            node.style.animation = 'move 1s';
+
+            setTimeout(appendNodeToBoard, 200 + x * 10, node);
+
             x++;
         }
 
@@ -416,7 +427,9 @@ function buildBoard() {
     }
 }
 
-
+function appendNodeToBoard(node) {
+    CONTAINER.appendChild(node);
+}
 
 function getCoordinates(e) {
 
@@ -574,3 +587,18 @@ function removeBorders() {
     document.getElementById(globalEnd.y + globalEnd.x).style.boxShadow = "0px 0px 0px 0px black inset";
     document.getElementById(globalStart.y + globalStart.x).style.boxShadow = "0px 0px 0px 0px black inset";
 }
+
+function animate(x, y) {
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    var keyFrames = '\
+        @-webkit-keyframes move {\
+            100% {\
+                -webkit-transform: translateX(DYNAMIC_X) translateY(DYNAMIC_Y);\
+            }\
+        }';
+    style.innerHTML = keyFrames.replace('DYNAMIC_X', x).replace('DYNAMIC_Y', y);
+    document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+
