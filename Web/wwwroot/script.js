@@ -21,7 +21,7 @@ var OTHER_PLAYER_HAS_JOINED = false;
 
 var INVALID_PLAY_TYPES = {
     0: "Wrong player",
-    1 : "Out of turn"
+    1: "Out of turn"
 };
 
 var PIECE_LOOKUP = {
@@ -41,6 +41,7 @@ var PIECE_LOOKUP = {
 
 var globalStart = null;
 var globalEnd = null;
+
 
 function writeMessage(message) {
     document.getElementById('messages').innerHTML = message;
@@ -78,10 +79,10 @@ function listRecentlyStartedGames(gamesText) {
     for (var i = 0; i < games.length; i++) {
         var node = document.createElement('div');
 
-        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"'  +
-                            '<strong>' + games[i].key + '</strong>' +
-                            '<br> Started ' + games[i].dateDisplay +
-                          '</div>';
+        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"' +
+            '<strong>' + games[i].key + '</strong>' +
+            '<br> Started ' + games[i].dateDisplay +
+            '</div>';
 
         node.classList.add('gameListing');
 
@@ -282,10 +283,14 @@ function buildBoard() {
 
     var squareSize = Math.floor(Math.floor(gameBoardWidth) / 9);
 
-    var fontSize = Math.floor(squareSize * 0.71); 
+    var fontSize = Math.floor(squareSize * 0.71);
+
 
     document.getElementById('black-captured-pieces').style.fontSize = fontSize + 'px';
     document.getElementById('white-captured-pieces').style.fontSize = fontSize + 'px';
+
+    document.getElementById('black-captured-pieces').style.height = fontSize + 'px';
+    document.getElementById('white-captured-pieces').style.height = fontSize + 'px';
 
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
@@ -412,7 +417,7 @@ function buildBoard() {
             node.style.display = 'inline-block';
             node.onclick = getCoordinates;
 
-            node.style.animation = 'move 1s';
+            //node.style.animation = 'move 1s';
 
             setTimeout(appendNodeToBoard, 200 + x * 10, node);
 
@@ -521,6 +526,10 @@ function sendPawnPromotionRequest(pawnPromotionObject) {
     xhttp.send(JSON.stringify(pawnPromotionObject));
 }
 
+function animateMove() {
+
+}
+
 function movePiece(playResult, command, overridePieceName) {
 
     cmdArgs = command.split(' ');
@@ -531,21 +540,53 @@ function movePiece(playResult, command, overridePieceName) {
 
     var character = el.innerHTML;
 
-    el.style.color = el.style.backgroundColor;
+    //el.style.color = el.style.backgroundColor;
+
+    
+
+    el.style.animation = 'move 1s';
+    el.style.position = 'relative';
+    el.style.zIndex = 1000;
+    //make copy and animate
+
+    //var copyForAnimation = document.createElement("span");
+    //copyForAnimation.innerText = character;
+    //copyForAnimation.style.color = el.style.color;
+    //copyForAnimation.style.backgroundColor = 'red';
+    //copyForAnimation.style.position = 'absolute';
+    //copyForAnimation.style.top = 0;
+    //copyForAnimation.style.left = 0;
+
+    //el.appendChild(copyForAnimation);
+
+    //console.log('animated span: ', copyForAnimation.outerHTML);
 
 
-    var elTo = document.getElementById(end);
-    elTo.innerHTML = character + '&#xFE0E';
+    //
+    //copyForAnimation.style.position = 'relative';
+    //copyForAnimation.style.zIndex = 10000;
+    //copyForAnimation.style.animation = 'move 1s';
+    //copyForAnimation.style.animation = 'move 1s';
 
-    if (overridePieceName) {
-        console.log('play result from promotion object: ', playResult);
+    //
+    setTimeout(doMove, 1000, { playResult: playResult, overridePieceName: overridePieceName, end: end, character: character });
+    
+}
 
-        var pieceColor = playResult.turn === 1 ? "white" : "black";
 
-        elTo.innerHTML = PIECE_LOOKUP[pieceColor + overridePieceName.toLowerCase()] + '&#xFE0E';
+function doMove(obj) {
+    var elTo = document.getElementById(obj.end);
+    elTo.innerHTML = obj.character + '&#xFE0E';
+
+    if (obj.overridePieceName) {
+        console.log('play result from promotion object: ', obj.playResult);
+
+        var pieceColor = obj.playResult.turn === 1 ? "white" : "black";
+
+        elTo.innerHTML = PIECE_LOOKUP[pieceColor + obj.overridePieceName.toLowerCase()] + '&#xFE0E';
     }
 
-    if (character.charCodeAt(0) <= 9817) {
+    if (obj.character.charCodeAt(0) <= 9817) {
         elTo.style.color = "#ebebeb";
     }
     else {
@@ -560,12 +601,12 @@ function movePiece(playResult, command, overridePieceName) {
     globalStart = null;
     globalEnd = null;
 
-    if (playResult.capturedPiece !== null) {
-        var color = playResult.capturedPiece.color === 0 ? "black" : "white";
+    if (obj.playResult.capturedPiece !== null) {
+        var color = obj.playResult.capturedPiece.color === 0 ? "black" : "white";
 
         console.log("color: ", color);
 
-        var piece = PIECE_LOOKUP[color + playResult.capturedPiece.name.toLowerCase()];
+        var piece = PIECE_LOOKUP[color + obj.playResult.capturedPiece.name.toLowerCase()];
 
         document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece + '&#xFE0E';
     }
@@ -601,4 +642,4 @@ function animate(x, y) {
     document.getElementsByTagName('head')[0].appendChild(style);
 }
 
-
+animate('0', '212px');
