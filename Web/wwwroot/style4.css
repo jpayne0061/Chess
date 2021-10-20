@@ -99,6 +99,7 @@ body {
 #white-captured-pieces {
     overflow-wrap: break-word;
     font-size: 38px;
+    margin-bottom: 10px;
 }
 
 @media screen and (min-width: 1000px) {

@@ -689,6 +689,15 @@ function animateMove() {
 
 
 function animate(x, y) {
+    var head = document.getElementsByTagName('head')[0];
+
+    if (head && head.children && head.children > 0) {
+        for (var i = 4; i < head.children.length; i++) {
+            head.remove(head.children[i]);
+        }
+    }
+
+
     var style = document.createElement('style');
     style.type = 'text/css';
     var keyFrames = '\
@@ -701,6 +710,60 @@ function animate(x, y) {
     document.getElementsByTagName('head')[0].appendChild(style);
 }
 
+function getSlope(x, x1, y, y1) {
+    return (y1 - y) / (x1 - x);
+}
+
+function getDirectionX(x, x1) {
+    if (x1 > x && PLAYER_COLOR === 1) {
+        return -1;
+    }
+
+    if (x1 < x && PLAYER_COLOR === 1) {
+        return 1;
+    }
+
+    if (x1 > x && PLAYER_COLOR === 0) {
+        return 1;
+    }
+
+    if (x1 < x && PLAYER_COLOR === 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+function getDirectionY(y, y1) {
+    if (y1 > y && PLAYER_COLOR === 1) {
+        return -1;
+    }
+
+    if (y1 < y && PLAYER_COLOR === 1) {
+        return 1;
+    }
+
+    if (y1 > y && PLAYER_COLOR === 0) {
+        return 1;
+    }
+
+    if (y1 < y && PLAYER_COLOR === 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+function getDistanceX(x, x1) {
+    return Math.abs(x1 - x);
+}
+
+function getDistanceY(y, y1) {
+    return Math.abs(y1 - y);
+}
+ 
 
 function movePiece(playResult, command, overridePieceName) {
 
@@ -718,17 +781,25 @@ function movePiece(playResult, command, overridePieceName) {
     start = cmdArgs[0];
     end = cmdArgs[1];
 
+    var x = start[1];
+    var x1 = end[1];
+
+    var y = start[0];
+    var y1 = end[0];
+
     var startingElement = document.getElementById(start);
 
     var character = startingElement.innerHTML;
 
     startingElement.innerHTML = "<div id='move-it' style='inline-block; position: relative'>" + character + "</div>";
 
-    var orientation = PLAYER_COLOR === 1 ? -1 : -1;
+    //var distance = SQUARE_SIZE * getDistance(x, x1, y, y1);
 
-    var distance = SQUARE_SIZE * 2;
+    var distanceX = SQUARE_SIZE * getDistanceX(x, x1) * getDirectionX(x, x1) + 'px';//distance * getDirectionX(x, x1) + 'px';
 
-    animate('0', (distance * orientation) + 'px');
+    var distanceY = SQUARE_SIZE * getDistanceY(y, y1) * getDirectionY(y, y1) + 'px';//distance * getDirectionY(y, y1) + 'px';
+
+    animate(distanceX, distanceY);
 
     var movingElement = document.getElementById('move-it');
 
