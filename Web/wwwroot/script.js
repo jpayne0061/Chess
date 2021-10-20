@@ -574,6 +574,7 @@ function buildBoard() {
             node.style.fontSize = FONT_SIZE + 'px';
             node.style.paddingLeft = '6px';
             node.style.display = 'inline-block';
+            node.classList.add('noselect');
             node.onclick = getCoordinates;
 
             setTimeout(appendNodeToBoard, 200 + x * 10, node);
@@ -710,10 +711,6 @@ function animate(x, y) {
     document.getElementsByTagName('head')[0].appendChild(style);
 }
 
-function getSlope(x, x1, y, y1) {
-    return (y1 - y) / (x1 - x);
-}
-
 function getDirectionX(x, x1) {
     if (x1 > x && PLAYER_COLOR === 1) {
         return -1;
@@ -767,16 +764,6 @@ function getDistanceY(y, y1) {
 
 function movePiece(playResult, command, overridePieceName) {
 
-    //to do:
-
-    //swap ids of of start and end locations
-    //get slope from x and y of id - determine tranform and distance from this
-
-
-    //css animations and math lesson?
-    //for kids. Use linear algebra math to get slope, map movement 
-
-
     cmdArgs = command.split(' ');
     start = cmdArgs[0];
     end = cmdArgs[1];
@@ -793,11 +780,9 @@ function movePiece(playResult, command, overridePieceName) {
 
     startingElement.innerHTML = "<div id='move-it' style='inline-block; position: relative'>" + character + "</div>";
 
-    //var distance = SQUARE_SIZE * getDistance(x, x1, y, y1);
+    var distanceX = SQUARE_SIZE * getDistanceX(x, x1) * getDirectionX(x, x1) + 'px';
 
-    var distanceX = SQUARE_SIZE * getDistanceX(x, x1) * getDirectionX(x, x1) + 'px';//distance * getDirectionX(x, x1) + 'px';
-
-    var distanceY = SQUARE_SIZE * getDistanceY(y, y1) * getDirectionY(y, y1) + 'px';//distance * getDirectionY(y, y1) + 'px';
+    var distanceY = SQUARE_SIZE * getDistanceY(y, y1) * getDirectionY(y, y1) + 'px';
 
     animate(distanceX, distanceY);
 
