@@ -21,7 +21,7 @@ var OTHER_PLAYER_HAS_JOINED = false;
 
 var INVALID_PLAY_TYPES = {
     0: "Wrong player",
-    1 : "Out of turn"
+    1: "Out of turn"
 };
 
 var PIECE_LOOKUP = {
@@ -39,8 +39,11 @@ var PIECE_LOOKUP = {
     "blackpawn": "&#9823;"
 };
 
-var globalStart = null;
-var globalEnd = null;
+var GLOBAL_START = null;
+var GLOBAL_END = null;
+
+var SQUARE_SIZE = null;
+var FONT_SIZE = null;
 
 function writeMessage(message) {
     document.getElementById('messages').innerHTML = message;
@@ -78,10 +81,10 @@ function listRecentlyStartedGames(gamesText) {
     for (var i = 0; i < games.length; i++) {
         var node = document.createElement('div');
 
-        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"'  +
-                            '<strong>' + games[i].key + '</strong>' +
-                            '<br> Started ' + games[i].dateDisplay +
-                          '</div>';
+        node.innerHTML = '<div onclick="joinGameByKey(\'' + games[i].key + '\')"' +
+            '<strong>' + games[i].key + '</strong>' +
+            '<br> Started ' + games[i].dateDisplay +
+            '</div>';
 
         node.classList.add('gameListing');
 
@@ -97,9 +100,9 @@ function startGame() {
 
     hideGameInputs();
 
-    buildBoard();
+    buildBoardForWhite();
 
-    rotateBoard();
+    //rotateBoard();
 
     PLAYER_COLOR = 1;
 
@@ -274,18 +277,179 @@ function getScreenHeight() {
     return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 }
 
+
+function buildBoardForWhite() {
+    var x = 0;
+    var y = 7;
+
+    var gameBoardWidth = getScreenWidth() > 1000 ? getScreenWidth() * 0.50 : getScreenWidth();
+
+    SQUARE_SIZE = Math.floor(Math.floor(gameBoardWidth) / 9);
+
+    FONT_SIZE = Math.floor(SQUARE_SIZE * 0.71);
+
+
+    document.getElementById('black-captured-pieces').style.fontSize = FONT_SIZE + 'px';
+    document.getElementById('white-captured-pieces').style.fontSize = FONT_SIZE + 'px';
+
+    document.getElementById('black-captured-pieces').style.height = FONT_SIZE + 'px';
+    document.getElementById('white-captured-pieces').style.height = FONT_SIZE + 'px';
+
+    for (var i = 0; i < 8; i++) {
+        for (var j = 7; j >= 0; j--) {
+            var node = document.createElement("div");
+
+            node.setAttribute('dataX', j % 8);
+            node.setAttribute('dataY', y);
+
+            var locationCoords = y.toString() + (j % 8).toString();
+
+            node.setAttribute('id', locationCoords);
+
+            switch (locationCoords) {
+                case "00":
+                    node.innerHTML = "&#9814;"; //whiterook
+                    break;
+                case "01":
+                    node.innerHTML = "&#9816;"; //whiteknight
+                    break;
+                case "02":
+                    node.innerHTML = "&#9815;"; //whitebishop
+                    break;
+                case "03":
+                    node.innerHTML = "&#9812;"; //whiteking
+                    break;
+                case "04":
+                    node.innerHTML = "&#9813;"; //whitequeen
+                    break;
+                case "05":
+                    node.innerHTML = "&#9815;"; //whitebishop
+                    break;
+                case "06":
+                    node.innerHTML = "&#9816;"; //whiteknight
+                    break;
+                case "07":
+                    node.innerHTML = "&#9814;"; //whiterook
+                    break;
+                case "10":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "11":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "12":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "13":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "14":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "15":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "16":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "17":
+                    node.innerHTML = "&#9817;"; //whitepawn
+                    break;
+                case "70":
+                    node.innerHTML = "&#9820;";
+                    break;
+                case "71":
+                    node.innerHTML = "&#9822;";
+                    break;
+                case "72":
+                    node.innerHTML = "&#9821;";
+                    break;
+                case "73":
+                    node.innerHTML = "&#9818;";
+                    break;
+                case "74":
+                    node.innerHTML = "&#9819;";
+                    break;
+                case "75":
+                    node.innerHTML = "&#9821;";
+                    break;
+                case "76":
+                    node.innerHTML = "&#9822;";
+                    break;
+                case "77":
+                    node.innerHTML = "&#9820;";
+                    break;
+                case "60":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "61":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "62":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "63":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "64":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "65":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "66":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                case "67":
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    break;
+                default:
+                    node.innerHTML = "&#9823;&#xFE0E";
+                    node.style.color = x % 2 === 0 ? '#adadad' : '#666666';
+            }
+
+            if (locationCoords[0] === "0" || locationCoords[0] === "1") {
+                node.style.color = "#ebebeb";
+            }
+
+            node.style.backgroundColor = x % 2 === 0 ? '#adadad' : '#666666';
+            node.style.height = SQUARE_SIZE + 'px';
+            node.style.width = SQUARE_SIZE + 'px';
+            node.style.fontSize = FONT_SIZE + 'px';
+            node.style.paddingLeft = '6px';
+            node.style.display = 'inline-block';
+            node.onclick = getCoordinates;
+
+            setTimeout(appendNodeToBoard, 200 + x * 10, node);
+
+            x++;
+        }
+
+        x++;
+        y--;
+
+        var breakNode = document.createElement("div");
+        CONTAINER.appendChild(breakNode);
+    }
+}
+
 function buildBoard() {
+
     var x = 0;
     var y = 0;
 
     var gameBoardWidth = getScreenWidth() > 1000 ? getScreenWidth() * 0.50 : getScreenWidth();
 
-    var squareSize = Math.floor(Math.floor(gameBoardWidth) / 9);
+    SQUARE_SIZE = Math.floor(Math.floor(gameBoardWidth) / 9);
 
-    var fontSize = Math.floor(squareSize * 0.71); 
+    FONT_SIZE = Math.floor(SQUARE_SIZE * 0.71);
 
-    document.getElementById('black-captured-pieces').style.fontSize = fontSize + 'px';
-    document.getElementById('white-captured-pieces').style.fontSize = fontSize + 'px';
+
+    document.getElementById('black-captured-pieces').style.fontSize = FONT_SIZE + 'px';
+    document.getElementById('white-captured-pieces').style.fontSize = FONT_SIZE + 'px';
+
+    document.getElementById('black-captured-pieces').style.height = FONT_SIZE + 'px';
+    document.getElementById('white-captured-pieces').style.height = FONT_SIZE + 'px';
 
     for (var i = 0; i < 8; i++) {
         for (var j = 0; j < 8; j++) {
@@ -405,14 +569,12 @@ function buildBoard() {
             }
 
             node.style.backgroundColor = x % 2 === 0 ? '#adadad' : '#666666';
-            node.style.height = squareSize + 'px';
-            node.style.width = squareSize + 'px';
-            node.style.fontSize = fontSize + 'px';
+            node.style.height = SQUARE_SIZE + 'px';
+            node.style.width = SQUARE_SIZE + 'px';
+            node.style.fontSize = FONT_SIZE + 'px';
             node.style.paddingLeft = '6px';
             node.style.display = 'inline-block';
             node.onclick = getCoordinates;
-
-            node.style.animation = 'move 1s';
 
             setTimeout(appendNodeToBoard, 200 + x * 10, node);
 
@@ -450,27 +612,27 @@ function getCoordinates(e) {
 
     if ((character.charCodeAt(0) <= 9817 && PLAYER_COLOR !== 1 ||
         character.charCodeAt(0) > 9817 && PLAYER_COLOR !== 0) &&
-        globalStart === null) {
+        GLOBAL_START === null) {
         return;
     }
 
     giveBorder(e);
 
-    if (globalStart === null) {
-        globalStart = { x: x, y: y };
+    if (GLOBAL_START === null) {
+        GLOBAL_START = { x: x, y: y };
         return;
     }
     else {
-        if (globalStart.x === x && globalStart.y === y) {
-            globalStart = null;
-            globalEnd = null;
+        if (GLOBAL_START.x === x && GLOBAL_START.y === y) {
+            GLOBAL_START = null;
+            GLOBAL_END = null;
             removeBorder(e);
             return;
         }
 
-        globalEnd = { x: x, y: y };
+        GLOBAL_END = { x: x, y: y };
 
-        var move = globalStart.y + globalStart.x + ' ' + globalEnd.y + globalEnd.x + ' ' + GAME_ID;
+        var move = GLOBAL_START.y + GLOBAL_START.x + ' ' + GLOBAL_END.y + GLOBAL_END.x + ' ' + GAME_ID;
 
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", URL_ROOT + "/api/values/" + encodeURIComponent(move), true);
@@ -498,8 +660,8 @@ function getCoordinates(e) {
             }
             else {
                 removeBorders();
-                globalStart = null;
-                globalEnd = null;
+                GLOBAL_START = null;
+                GLOBAL_END = null;
             }
 
         };
@@ -521,51 +683,179 @@ function sendPawnPromotionRequest(pawnPromotionObject) {
     xhttp.send(JSON.stringify(pawnPromotionObject));
 }
 
+function animateMove() {
+
+}
+
+
+function animate(x, y) {
+    var head = document.getElementsByTagName('head')[0];
+
+    if (head && head.children && head.children > 0) {
+        for (var i = 4; i < head.children.length; i++) {
+            head.remove(head.children[i]);
+        }
+    }
+
+
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    var keyFrames = '\
+        @-webkit-keyframes move {\
+            100% {\
+                -webkit-transform: translateX(DYNAMIC_X) translateY(DYNAMIC_Y);\
+            }\
+        }';
+    style.innerHTML = keyFrames.replace('DYNAMIC_X', x).replace('DYNAMIC_Y', y);
+    document.getElementsByTagName('head')[0].appendChild(style);
+}
+
+function getSlope(x, x1, y, y1) {
+    return (y1 - y) / (x1 - x);
+}
+
+function getDirectionX(x, x1) {
+    if (x1 > x && PLAYER_COLOR === 1) {
+        return -1;
+    }
+
+    if (x1 < x && PLAYER_COLOR === 1) {
+        return 1;
+    }
+
+    if (x1 > x && PLAYER_COLOR === 0) {
+        return 1;
+    }
+
+    if (x1 < x && PLAYER_COLOR === 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+function getDirectionY(y, y1) {
+    if (y1 > y && PLAYER_COLOR === 1) {
+        return -1;
+    }
+
+    if (y1 < y && PLAYER_COLOR === 1) {
+        return 1;
+    }
+
+    if (y1 > y && PLAYER_COLOR === 0) {
+        return 1;
+    }
+
+    if (y1 < y && PLAYER_COLOR === 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+
+function getDistanceX(x, x1) {
+    return Math.abs(x1 - x);
+}
+
+function getDistanceY(y, y1) {
+    return Math.abs(y1 - y);
+}
+ 
+
 function movePiece(playResult, command, overridePieceName) {
+
+    //to do:
+
+    //swap ids of of start and end locations
+    //get slope from x and y of id - determine tranform and distance from this
+
+
+    //css animations and math lesson?
+    //for kids. Use linear algebra math to get slope, map movement 
+
 
     cmdArgs = command.split(' ');
     start = cmdArgs[0];
     end = cmdArgs[1];
 
-    var el = document.getElementById(start);
+    var x = start[1];
+    var x1 = end[1];
 
-    var character = el.innerHTML;
+    var y = start[0];
+    var y1 = end[0];
 
-    el.style.color = el.style.backgroundColor;
+    var startingElement = document.getElementById(start);
+
+    var character = startingElement.innerHTML;
+
+    startingElement.innerHTML = "<div id='move-it' style='inline-block; position: relative'>" + character + "</div>";
+
+    //var distance = SQUARE_SIZE * getDistance(x, x1, y, y1);
+
+    var distanceX = SQUARE_SIZE * getDistanceX(x, x1) * getDirectionX(x, x1) + 'px';//distance * getDirectionX(x, x1) + 'px';
+
+    var distanceY = SQUARE_SIZE * getDistanceY(y, y1) * getDirectionY(y, y1) + 'px';//distance * getDirectionY(y, y1) + 'px';
+
+    animate(distanceX, distanceY);
+
+    var movingElement = document.getElementById('move-it');
+
+    movingElement.style.animation = 'move 1s forwards';
+    movingElement.style.position = 'relative';
+    movingElement.style.zIndex = 1000;
+
+    var animationCallBackParameters = {
+        playResult: playResult,
+        overridePieceName: overridePieceName,
+        end: end,
+        character: character,
+        startingElement: startingElement
+    };
+
+    setTimeout(doMove, 1000, animationCallBackParameters);
+    
+}
 
 
-    var elTo = document.getElementById(end);
-    elTo.innerHTML = character + '&#xFE0E';
+function doMove(animationCallBackParameters) {
+    animationCallBackParameters.startingElement.innerHTML = animationCallBackParameters.character;
+    animationCallBackParameters.startingElement.style.color = animationCallBackParameters.startingElement.style.backgroundColor;
 
-    if (overridePieceName) {
-        console.log('play result from promotion object: ', playResult);
+    var elTo = document.getElementById(animationCallBackParameters.end);
+    elTo.innerHTML = animationCallBackParameters.character + '&#xFE0E';
 
-        var pieceColor = playResult.turn === 1 ? "white" : "black";
+    if (animationCallBackParameters.overridePieceName) {
+        console.log('play result from promotion object: ', animationCallBackParameters.playResult);
 
-        elTo.innerHTML = PIECE_LOOKUP[pieceColor + overridePieceName.toLowerCase()] + '&#xFE0E';
+        var pieceColor = animationCallBackParameters.playResult.turn === 1 ? "white" : "black";
+
+        elTo.innerHTML = PIECE_LOOKUP[pieceColor + animationCallBackParameters.overridePieceName.toLowerCase()] + '&#xFE0E';
     }
 
-    if (character.charCodeAt(0) <= 9817) {
+    if (animationCallBackParameters.character.charCodeAt(0) <= 9817) {
         elTo.style.color = "#ebebeb";
     }
     else {
         elTo.style.color = "#000";
     }
 
-    if (globalStart !== null) {
+    if (GLOBAL_START !== null) {
         removeBorders();
     }
 
 
-    globalStart = null;
-    globalEnd = null;
+    GLOBAL_START = null;
+    GLOBAL_END = null;
 
-    if (playResult.capturedPiece !== null) {
-        var color = playResult.capturedPiece.color === 0 ? "black" : "white";
+    if (animationCallBackParameters.playResult.capturedPiece !== null) {
+        var color = animationCallBackParameters.playResult.capturedPiece.color === 0 ? "black" : "white";
 
         console.log("color: ", color);
 
-        var piece = PIECE_LOOKUP[color + playResult.capturedPiece.name.toLowerCase()];
+        var piece = PIECE_LOOKUP[color + animationCallBackParameters.playResult.capturedPiece.name.toLowerCase()];
 
         document.getElementById(color.toLowerCase() + "-captured-pieces").innerHTML += piece + '&#xFE0E';
     }
@@ -584,21 +874,8 @@ function removeBorder(e) {
 }
 
 function removeBorders() {
-    document.getElementById(globalEnd.y + globalEnd.x).style.boxShadow = "0px 0px 0px 0px black inset";
-    document.getElementById(globalStart.y + globalStart.x).style.boxShadow = "0px 0px 0px 0px black inset";
-}
-
-function animate(x, y) {
-    var style = document.createElement('style');
-    style.type = 'text/css';
-    var keyFrames = '\
-        @-webkit-keyframes move {\
-            100% {\
-                -webkit-transform: translateX(DYNAMIC_X) translateY(DYNAMIC_Y);\
-            }\
-        }';
-    style.innerHTML = keyFrames.replace('DYNAMIC_X', x).replace('DYNAMIC_Y', y);
-    document.getElementsByTagName('head')[0].appendChild(style);
+    document.getElementById(GLOBAL_END.y + GLOBAL_END.x).style.boxShadow = "0px 0px 0px 0px black inset";
+    document.getElementById(GLOBAL_START.y + GLOBAL_START.x).style.boxShadow = "0px 0px 0px 0px black inset";
 }
 
 

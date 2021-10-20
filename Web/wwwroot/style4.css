@@ -27,6 +27,10 @@ body {
     transform: rotate(180deg);
 }
 
+.rotatedNoneHack {
+    transform: rotate(0deg);
+}
+
 .btn {
     padding: 30px;
     border: none;
@@ -95,6 +99,7 @@ body {
 #white-captured-pieces {
     overflow-wrap: break-word;
     font-size: 38px;
+    margin-bottom: 10px;
 }
 
 @media screen and (min-width: 1000px) {
