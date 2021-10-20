@@ -27,6 +27,10 @@ body {
     transform: rotate(180deg);
 }
 
+.rotatedNoneHack {
+    transform: rotate(0deg);
+}
+
 .btn {
     padding: 30px;
     border: none;
