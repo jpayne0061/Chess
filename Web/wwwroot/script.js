@@ -102,8 +102,6 @@ function startGame() {
 
     buildBoardForWhite();
 
-    //rotateBoard();
-
     PLAYER_COLOR = 1;
 
     YOUR_TURN = true;
@@ -122,7 +120,6 @@ function rotatePieces() {
 
     for (var i = 0; i < pieces.length; i++) {
         pieces[i].style.animation = 'spin 1s forwards';
-        //pieces[i].classList.add('rotated');
     }
 }
 
@@ -574,7 +571,6 @@ function buildBoard() {
             node.style.fontSize = FONT_SIZE + 'px';
             node.style.paddingLeft = '6px';
             node.style.display = 'inline-block';
-            node.classList.add('noselect');
             node.onclick = getCoordinates;
 
             setTimeout(appendNodeToBoard, 200 + x * 10, node);
