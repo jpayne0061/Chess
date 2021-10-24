@@ -2,10 +2,6 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: Calibri;
-}
-
 #main-container {
     display: block;
     text-align: center;

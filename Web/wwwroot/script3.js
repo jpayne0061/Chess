@@ -400,9 +400,6 @@ function buildBoardForWhite() {
                 case "67":
                     node.innerHTML = "&#9823;&#xFE0E";
                     break;
-                default:
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    node.style.color = x % 2 === 0 ? '#adadad' : '#666666';
             }
 
             if (locationCoords[0] === "0" || locationCoords[0] === "1") {
@@ -413,8 +410,8 @@ function buildBoardForWhite() {
             node.style.height = SQUARE_SIZE + 'px';
             node.style.width = SQUARE_SIZE + 'px';
             node.style.fontSize = FONT_SIZE + 'px';
-            node.style.paddingLeft = '6px';
             node.style.display = 'inline-block';
+            node.style.verticalAlign = 'top';
             node.onclick = getCoordinates;
 
             setTimeout(appendNodeToBoard, 200 + x * 10, node);
@@ -556,9 +553,6 @@ function buildBoard() {
                 case "67":
                     node.innerHTML = "&#9823;&#xFE0E";
                     break;
-                default:
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    node.style.color = x % 2 === 0 ? '#adadad' : '#666666';
             }
 
             if (locationCoords[0] === "0" || locationCoords[0] === "1") {
@@ -569,8 +563,8 @@ function buildBoard() {
             node.style.height = SQUARE_SIZE + 'px';
             node.style.width = SQUARE_SIZE + 'px';
             node.style.fontSize = FONT_SIZE + 'px';
-            node.style.paddingLeft = '6px';
             node.style.display = 'inline-block';
+            node.style.verticalAlign = 'top';
             node.onclick = getCoordinates;
 
             setTimeout(appendNodeToBoard, 200 + x * 10, node);
@@ -694,7 +688,6 @@ function animate(x, y) {
         }
     }
 
-
     var style = document.createElement('style');
     style.type = 'text/css';
     var keyFrames = '\
@@ -802,8 +795,7 @@ function movePiece(playResult, command, overridePieceName) {
 
 
 function doMove(animationCallBackParameters) {
-    animationCallBackParameters.startingElement.innerHTML = animationCallBackParameters.character;
-    animationCallBackParameters.startingElement.style.color = animationCallBackParameters.startingElement.style.backgroundColor;
+    animationCallBackParameters.startingElement.innerHTML = '';
 
     var elTo = document.getElementById(animationCallBackParameters.end);
     elTo.innerHTML = animationCallBackParameters.character + '&#xFE0E';
