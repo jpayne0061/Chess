@@ -100,9 +100,9 @@ function startGame() {
 
     hideGameInputs();
 
-    buildBoardForWhite();
-
     PLAYER_COLOR = 1;
+
+    buildBoard();
 
     YOUR_TURN = true;
 
@@ -274,149 +274,139 @@ function getScreenHeight() {
     return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
 }
 
+function createBoardNode(x, y, j) {
+    var node = document.createElement("div");
 
-function buildBoardForWhite() {
-    var x = 0;
-    var y = 7;
+    node.setAttribute('dataX', j % 8);
+    node.setAttribute('dataY', y);
 
-    var gameBoardWidth = getScreenWidth() > 1000 ? getScreenWidth() * 0.50 : getScreenWidth();
+    var locationCoords = y.toString() + (j % 8).toString();
 
-    SQUARE_SIZE = Math.floor(Math.floor(gameBoardWidth) / 9);
+    node.setAttribute('id', locationCoords);
 
-    FONT_SIZE = Math.floor(SQUARE_SIZE * 0.71);
+    switch (locationCoords) {
+        case "00":
+            node.innerHTML = "&#9814;"; //whiterook
+            break;
+        case "01":
+            node.innerHTML = "&#9816;"; //whiteknight
+            break;
+        case "02":
+            node.innerHTML = "&#9815;"; //whitebishop
+            break;
+        case "03":
+            node.innerHTML = "&#9812;"; //whiteking
+            break;
+        case "04":
+            node.innerHTML = "&#9813;"; //whitequeen
+            break;
+        case "05":
+            node.innerHTML = "&#9815;"; //whitebishop
+            break;
+        case "06":
+            node.innerHTML = "&#9816;"; //whiteknight
+            break;
+        case "07":
+            node.innerHTML = "&#9814;"; //whiterook
+            break;
+        case "10":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "11":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "12":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "13":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "14":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "15":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "16":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "17":
+            node.innerHTML = "&#9817;"; //whitepawn
+            break;
+        case "70":
+            node.innerHTML = "&#9820;";
+            break;
+        case "71":
+            node.innerHTML = "&#9822;";
+            break;
+        case "72":
+            node.innerHTML = "&#9821;";
+            break;
+        case "73":
+            node.innerHTML = "&#9818;";
+            break;
+        case "74":
+            node.innerHTML = "&#9819;";
+            break;
+        case "75":
+            node.innerHTML = "&#9821;";
+            break;
+        case "76":
+            node.innerHTML = "&#9822;";
+            break;
+        case "77":
+            node.innerHTML = "&#9820;";
+            break;
+        case "60":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "61":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "62":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "63":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "64":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "65":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "66":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+        case "67":
+            node.innerHTML = "&#9823;&#xFE0E";
+            break;
+    }
+
+    if (locationCoords[0] === "0" || locationCoords[0] === "1") {
+        node.style.color = "#ebebeb";
+    }
+
+    node.style.backgroundColor = x % 2 === 0 ? '#adadad' : '#666666';
+    node.style.height = SQUARE_SIZE + 'px';
+    node.style.width = SQUARE_SIZE + 'px';
+    node.style.fontSize = FONT_SIZE + 'px';
+    node.style.display = 'inline-block';
+    node.style.verticalAlign = 'top';
+    node.onclick = getCoordinates;
+
+    setTimeout(appendNodeToBoard, 200 + x * 10, node);
+
+    x++;
+
+    return x;
+}
 
 
-    document.getElementById('black-captured-pieces').style.fontSize = FONT_SIZE + 'px';
-    document.getElementById('white-captured-pieces').style.fontSize = FONT_SIZE + 'px';
-
-    document.getElementById('black-captured-pieces').style.height = FONT_SIZE + 'px';
-    document.getElementById('white-captured-pieces').style.height = FONT_SIZE + 'px';
-
+function whiteLoop(x, y) {
     for (var i = 0; i < 8; i++) {
         for (var j = 7; j >= 0; j--) {
-            var node = document.createElement("div");
-
-            node.setAttribute('dataX', j % 8);
-            node.setAttribute('dataY', y);
-
-            var locationCoords = y.toString() + (j % 8).toString();
-
-            node.setAttribute('id', locationCoords);
-
-            switch (locationCoords) {
-                case "00":
-                    node.innerHTML = "&#9814;"; //whiterook
-                    break;
-                case "01":
-                    node.innerHTML = "&#9816;"; //whiteknight
-                    break;
-                case "02":
-                    node.innerHTML = "&#9815;"; //whitebishop
-                    break;
-                case "03":
-                    node.innerHTML = "&#9812;"; //whiteking
-                    break;
-                case "04":
-                    node.innerHTML = "&#9813;"; //whitequeen
-                    break;
-                case "05":
-                    node.innerHTML = "&#9815;"; //whitebishop
-                    break;
-                case "06":
-                    node.innerHTML = "&#9816;"; //whiteknight
-                    break;
-                case "07":
-                    node.innerHTML = "&#9814;"; //whiterook
-                    break;
-                case "10":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "11":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "12":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "13":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "14":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "15":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "16":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "17":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "70":
-                    node.innerHTML = "&#9820;";
-                    break;
-                case "71":
-                    node.innerHTML = "&#9822;";
-                    break;
-                case "72":
-                    node.innerHTML = "&#9821;";
-                    break;
-                case "73":
-                    node.innerHTML = "&#9818;";
-                    break;
-                case "74":
-                    node.innerHTML = "&#9819;";
-                    break;
-                case "75":
-                    node.innerHTML = "&#9821;";
-                    break;
-                case "76":
-                    node.innerHTML = "&#9822;";
-                    break;
-                case "77":
-                    node.innerHTML = "&#9820;";
-                    break;
-                case "60":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "61":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "62":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "63":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "64":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "65":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "66":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "67":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-            }
-
-            if (locationCoords[0] === "0" || locationCoords[0] === "1") {
-                node.style.color = "#ebebeb";
-            }
-
-            node.style.backgroundColor = x % 2 === 0 ? '#adadad' : '#666666';
-            node.style.height = SQUARE_SIZE + 'px';
-            node.style.width = SQUARE_SIZE + 'px';
-            node.style.fontSize = FONT_SIZE + 'px';
-            node.style.display = 'inline-block';
-            node.style.verticalAlign = 'top';
-            node.onclick = getCoordinates;
-
-            setTimeout(appendNodeToBoard, 200 + x * 10, node);
-
-            x++;
+            x = createBoardNode(x, y, j);
         }
 
         x++;
@@ -427,10 +417,23 @@ function buildBoardForWhite() {
     }
 }
 
-function buildBoard() {
+function blackLoop(x, y) {
+    for (var i = 0; i < 8; i++) {
+        for (var j = 0; j < 8; j++) {
+            x = createBoardNode(x, y, j);
+        }
 
+        x++;
+        y++;
+
+        var breakNode = document.createElement("div");
+        CONTAINER.appendChild(breakNode);
+    }
+}
+
+function buildBoard() {
     var x = 0;
-    var y = 0;
+    var y = PLAYER_COLOR === 1 ? 7 : 0;
 
     var gameBoardWidth = getScreenWidth() > 1000 ? getScreenWidth() * 0.50 : getScreenWidth();
 
@@ -445,140 +448,15 @@ function buildBoard() {
     document.getElementById('black-captured-pieces').style.height = FONT_SIZE + 'px';
     document.getElementById('white-captured-pieces').style.height = FONT_SIZE + 'px';
 
-    for (var i = 0; i < 8; i++) {
-        for (var j = 0; j < 8; j++) {
-            var node = document.createElement("div");
-
-            node.setAttribute('dataX', j % 8);
-            node.setAttribute('dataY', y);
-
-            var locationCoords = y.toString() + (j % 8).toString();
-
-            node.setAttribute('id', locationCoords);
-
-            switch (locationCoords) {
-                case "00":
-                    node.innerHTML = "&#9814;"; //whiterook
-                    break;
-                case "01":
-                    node.innerHTML = "&#9816;"; //whiteknight
-                    break;
-                case "02":
-                    node.innerHTML = "&#9815;"; //whitebishop
-                    break;
-                case "03":
-                    node.innerHTML = "&#9812;"; //whiteking
-                    break;
-                case "04":
-                    node.innerHTML = "&#9813;"; //whitequeen
-                    break;
-                case "05":
-                    node.innerHTML = "&#9815;"; //whitebishop
-                    break;
-                case "06":
-                    node.innerHTML = "&#9816;"; //whiteknight
-                    break;
-                case "07":
-                    node.innerHTML = "&#9814;"; //whiterook
-                    break;
-                case "10":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "11":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "12":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "13":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "14":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "15":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "16":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "17":
-                    node.innerHTML = "&#9817;"; //whitepawn
-                    break;
-                case "70":
-                    node.innerHTML = "&#9820;";
-                    break;
-                case "71":
-                    node.innerHTML = "&#9822;";
-                    break;
-                case "72":
-                    node.innerHTML = "&#9821;";
-                    break;
-                case "73":
-                    node.innerHTML = "&#9818;";
-                    break;
-                case "74":
-                    node.innerHTML = "&#9819;";
-                    break;
-                case "75":
-                    node.innerHTML = "&#9821;";
-                    break;
-                case "76":
-                    node.innerHTML = "&#9822;";
-                    break;
-                case "77":
-                    node.innerHTML = "&#9820;";
-                    break;
-                case "60":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "61":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "62":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "63":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "64":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "65":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "66":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-                case "67":
-                    node.innerHTML = "&#9823;&#xFE0E";
-                    break;
-            }
-
-            if (locationCoords[0] === "0" || locationCoords[0] === "1") {
-                node.style.color = "#ebebeb";
-            }
-
-            node.style.backgroundColor = x % 2 === 0 ? '#adadad' : '#666666';
-            node.style.height = SQUARE_SIZE + 'px';
-            node.style.width = SQUARE_SIZE + 'px';
-            node.style.fontSize = FONT_SIZE + 'px';
-            node.style.display = 'inline-block';
-            node.style.verticalAlign = 'top';
-            node.onclick = getCoordinates;
-
-            setTimeout(appendNodeToBoard, 200 + x * 10, node);
-
-            x++;
-        }
-
-        x++;
-        y++;
-
-        var breakNode = document.createElement("div");
-        CONTAINER.appendChild(breakNode);
+    if (PLAYER_COLOR === 1) {
+        whiteLoop(x, y);
+    }
+    else {
+        blackLoop(x, y);
     }
 }
+
+
 
 function appendNodeToBoard(node) {
     CONTAINER.appendChild(node);
