@@ -22,7 +22,7 @@ namespace Web.Services
             _playResultDal = playResultDal;
         }
 
-        public async Task<PlayResult> MakeMove(string command, Game game)
+        public async Task<PlayResult> MakeMove(string command, GameLogic game)
         {
             string[] commandParts = command.Split(' ');
 
@@ -49,7 +49,7 @@ namespace Web.Services
             return pr;
         }
 
-        public async Task PromotePawn(PawnPromotion pawnPromotion, Game game)
+        public async Task PromotePawn(PawnPromotion pawnPromotion, GameLogic game)
         {
             game.PromotePawn(pawnPromotion);
 

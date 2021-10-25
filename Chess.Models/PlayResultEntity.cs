@@ -4,10 +4,8 @@ namespace Chess.Models
 {
     public class PlayResultEntity
     {
-        public PlayResultEntity()
-        {
-
-        }
+        //parameterless ctor required for HotSauceDB
+        public PlayResultEntity() { }
 
         public PlayResultEntity(PlayResult playResult)
         {
@@ -28,7 +26,6 @@ namespace Chess.Models
         public int Turn { get; set; }
         [StringLength(25)]
         public string Command { get; set; }
-
 
     }
 }

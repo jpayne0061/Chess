@@ -13,13 +13,13 @@ namespace Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class GameController : ControllerBase
     {
         IMemoryCache _memoryCache;
         IGameSessionDal _gameSessionDal;
         GameFlow _gameFlow;
 
-        public ValuesController(IMemoryCache memoryCache, 
+        public GameController(IMemoryCache memoryCache, 
                             IHubContext<MessageHub> hubContext, 
                             IPlayResultDal playResultDal, 
                             IGameSessionDal gameSessionDal)
@@ -52,7 +52,7 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<PawnPromotion> ChoosePawnPromotion([FromBody] PawnPromotion pawnPromotion)
         {
-            Game game = (Game)_memoryCache.Get(pawnPromotion.GameKey);
+            GameLogic game = (GameLogic)_memoryCache.Get(pawnPromotion.GameKey);
 
             await _gameFlow.PromotePawn(pawnPromotion, game);
 
@@ -67,7 +67,7 @@ namespace Web.Controllers
 
             string gameId = splitCommand[2];
 
-            Game game = (Game)_memoryCache.Get(gameId);
+            GameLogic game = (GameLogic)_memoryCache.Get(gameId);
 
             return await _gameFlow.MakeMove(command, game);
         }
@@ -79,7 +79,7 @@ namespace Web.Controllers
         {
             string gameKey = _gameFlow.CreateGame();
 
-            _memoryCache.Set(gameKey, new Game());
+            _memoryCache.Set(gameKey, new GameLogic());
 
             return gameKey;
         }

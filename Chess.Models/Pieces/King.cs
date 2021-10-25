@@ -1,7 +1,4 @@
 ﻿using Chess.Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Chess.Models.Pieces
 {
@@ -9,7 +6,7 @@ namespace Chess.Models.Pieces
     {
         public King(int x, int y, Color color) : base(x, y, color)
         {
-            Name = "King";
+            _pieceName = PieceNames.King;
         }
     }
 }

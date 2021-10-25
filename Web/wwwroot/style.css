@@ -10,6 +10,7 @@
 #game-container {
     display: inline-block;
     outline-style: none;
+    margin-top: 5px;
 }
 
 .selected {

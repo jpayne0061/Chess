@@ -9,7 +9,7 @@ namespace Chess.Models.Pieces
     {
         public Knight(int x, int y, Color color) : base(x, y, color)
         {
-            Name = "Knight";
+            _pieceName = PieceNames.Knight;
         }
     }
 }

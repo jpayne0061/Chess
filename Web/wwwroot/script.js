@@ -1,8 +1,8 @@
 ﻿if (window.location.href.indexOf('localhost') > -1) {
-    URL_ROOT = 'https://localhost:44320';
+    URL_ROOT = 'https://localhost:44320/api/Game/';
 }
 else {
-    URL_ROOT = 'https://chesswithhotsauce.azurewebsites.net';
+    URL_ROOT = 'https://chesswithhotsauce.azurewebsites.net/api/Game/';
 }
 
 var GAME_ID = "";
@@ -109,12 +109,12 @@ function startGame() {
 
     YOUR_TURN = true;
 
-    setTimeout(writeMessage, 1700, 'it is your turn');}
+    setTimeout(writeMessage, 1700, 'It is your turn');}
 
 function notifyPawnPromotionChoice(message) {
     if (message.pieceName && message.turn === PLAYER_COLOR) {
-        writeMessage('other player has promoted their pawn to ' + message.pieceName + '. It is your turn');
-        movePiece(message.message, message.message.command, message.pieceName);
+        writeMessage('Other player has promoted their pawn to ' + message.pieceName + '. It is your turn');
+        animateMovement(message.message, message.message.command, message.pieceName);
         return;
     }
 }
@@ -132,20 +132,20 @@ function handleMovePiece(message) {
 
     if (message.isCheckMate) {
         CHECK_MATE = true;
-        writeMessage('check mate');
+        writeMessage('Check mate');
     }
     else if (message.turn === PLAYER_COLOR && message.isCheck) {
-        writeMessage('it is your turn. you are in check');
+        writeMessage('It is your turn. you are in check');
     }
     else if (message.turn === PLAYER_COLOR) {
-        writeMessage('it is your turn');
+        writeMessage('It is your turn');
     }
     else if (message.isCheck) {
-        writeMessage('check');
+        writeMessage('Check');
     }
 
     if (message.turn === PLAYER_COLOR) {
-        movePiece(message, command);
+        animateMovement(message, command);
     }
 
     choosePawnPromotion(message);
@@ -180,7 +180,7 @@ function choosePawnPiece(pieceName) {
 function notifyPawnPromotionChoosing(message) {
     //other player is choosing for pawn promotion
     if (message.turn !== PLAYER_COLOR && message.isEligibleForPawnPromotion) {
-        writeMessage('other player is choosing piece for pawn promotion');
+        writeMessage('Other player is choosing piece for pawn promotion');
         return;
     }
 }
@@ -231,7 +231,7 @@ function showGameKey() {
 
 function startNewGame() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", URL_ROOT + "/api/values/CreateGame", true);
+    xhttp.open("GET", URL_ROOT + "CreateGame", true);
     xhttp.send();
 
     xhttp.onload = function () {
@@ -249,7 +249,7 @@ function startNewGame() {
 
 function joinIfGameIdValid(setUp) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", URL_ROOT + "/api/values/JoinGame?gameKey=" + GAME_ID, true);
+    xhttp.open("GET", URL_ROOT + "JoinGame?gameKey=" + GAME_ID, true);
     xhttp.send();
 
     xhttp.onload = function () {
@@ -267,14 +267,14 @@ function joinIfGameIdValid(setUp) {
 
 function getRecentlyStartedGames() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", URL_ROOT + "/api/values/GetRecentGames", true);
+    xhttp.open("GET", URL_ROOT + "GetRecentGames", true);
     xhttp.send();
 
     xhttp.onload = function () {
         console.log("recent games: ", this.responseText);
 
         if (this.responseText.length <= 5) {
-            writeMessage('there are currently no games to join');
+            writeMessage('There are currently no games to join');
             return;
         }
 
@@ -409,7 +409,7 @@ function createBoardNode(x, y, j) {
     node.style.fontSize = FONT_SIZE + 'px';
     node.style.display = 'inline-block';
     node.style.verticalAlign = 'top';
-    node.onclick = getCoordinates;
+    node.onclick = handleUserMove;
 
     setTimeout(appendNodeToBoard, 200 + x * 10, node);
 
@@ -477,7 +477,7 @@ function appendNodeToBoard(node) {
     CONTAINER.appendChild(node);
 }
 
-function getCoordinates(e) {
+function handleUserMove(e) {
 
     if (!OTHER_PLAYER_HAS_JOINED) {
         alert('you must wait for other player to join game');
@@ -506,69 +506,68 @@ function getCoordinates(e) {
         PLAY_START = { x: x, y: y };
         return;
     }
-    else {
-        if (PLAY_START.x === x && PLAY_START.y === y) {
-            PLAY_START = null;
-            PLAY_END = null;
-            removeBorder(e);
-            return;
-        }
 
-        PLAY_END = { x: x, y: y };
+    if (PLAY_START.x === x && PLAY_START.y === y) {
+        PLAY_START = null;
+        PLAY_END = null;
+        removeBorder(e);
+        return;
+    }
 
-        var move = PLAY_START.y + PLAY_START.x + ' ' + PLAY_END.y + PLAY_END.x + ' ' + GAME_ID;
+    PLAY_END = { x: x, y: y };
 
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", URL_ROOT + "/api/values/" + encodeURIComponent(move), true);
-        xhttp.send();
+    var move = PLAY_START.y + PLAY_START.x + ' ' + PLAY_END.y + PLAY_END.x + ' ' + GAME_ID;
 
-        xhttp.onload = function () {
-            var playResult = JSON.parse(this.responseText);
-            console.log('playResult from getCoordinates: ', playResult);
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", URL_ROOT + encodeURIComponent(move), true);
+    xhttp.send();
 
-            document.getElementById("messages").innerHTML = playResult.message;
+    xhttp.onload = function () {
+        var playResult = JSON.parse(this.responseText);
 
-            if (playResult.isCheck) {
-                if (playResult.isCheckMate) {
-                    alert("Check mate");
-                    CHECK_MATE = true;
-                    document.getElementById("restart-game").style.display = "block";
-                }
-                else {
-                    document.getElementById("messages").innerHTML = "Check";
-                }
-            }
+        writeMessage(playResult.message);
 
-            if (playResult.playValid) {
-                movePiece(playResult, move);
+        if (playResult.isCheck) {
+            if (playResult.isCheckMate) {
+                alert("Check mate");
+                CHECK_MATE = true;
+                document.getElementById("restart-game").style.display = "block";
             }
             else {
-                removeBorders();
-                PLAY_START = null;
-                PLAY_END = null;
+                writeMessage("Check");
             }
+        }
 
-        };
-    }
+        if (playResult.playValid) {
+            animateMovement(playResult, move);
+        }
+        else {
+            removeBorders();
+            PLAY_START = null;
+            PLAY_END = null;
+        }
+
+    };
 }
 
 function sendPawnPromotionRequest(pawnPromotionObject) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", URL_ROOT + "/api/values/", true);
+    xhttp.open("POST", URL_ROOT, true);
     xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
             console.log("result from promotion post", this.responseText);
+
             var pawnPromotionObject = JSON.parse(this.responseText);
-            movePiece(pawnPromotionObject.message, pawnPromotionObject.message.command, pawnPromotionObject.pieceName, pawnPromotionObject.promotedPieceColor);
+
+            animateMovement(pawnPromotionObject.message,
+                      pawnPromotionObject.message.command,
+                      pawnPromotionObject.pieceName,
+                      pawnPromotionObject.promotedPieceColor);
         }
     };
 
     xhttp.send(JSON.stringify(pawnPromotionObject));
-}
-
-function animateMove() {
-
 }
 
 
@@ -644,7 +643,7 @@ function getDistanceY(y, y1) {
 }
  
 
-function movePiece(playResult, command, overridePieceName, promotedPieceColor) {
+function animateMovement(playResult, command, overridePieceName, promotedPieceColor) {
 
     cmdArgs = command.split(' ');
     start = cmdArgs[0];
@@ -683,22 +682,18 @@ function movePiece(playResult, command, overridePieceName, promotedPieceColor) {
         promotedPieceColor: promotedPieceColor
     };
 
-    setTimeout(doMove, 1000, animationCallBackParameters);
+    setTimeout(movePiece, 1000, animationCallBackParameters);
     
 }
 
 
-function doMove(animationCallBackParameters) {
-    console.log('character: ', animationCallBackParameters.character);
-
+function movePiece(animationCallBackParameters) {
     animationCallBackParameters.startingElement.innerHTML = '';
 
     var elTo = document.getElementById(animationCallBackParameters.end);
     elTo.innerHTML = animationCallBackParameters.character + '&#xFE0E';
 
     if (animationCallBackParameters.overridePieceName) {
-        console.log('play result from promotion object: ', animationCallBackParameters.playResult);
-        console.log('animationCallBackParameters', animationCallBackParameters);
 
         var pieceColor = animationCallBackParameters.playResult.turn === 1 ? "white" : "black";
 
@@ -726,8 +721,6 @@ function doMove(animationCallBackParameters) {
 
     if (animationCallBackParameters.playResult.capturedPiece !== null) {
         var color = animationCallBackParameters.playResult.capturedPiece.color === 0 ? "black" : "white";
-
-        console.log("color: ", color);
 
         var piece = PIECE_LOOKUP[color + animationCallBackParameters.playResult.capturedPiece.name.toLowerCase()];
 

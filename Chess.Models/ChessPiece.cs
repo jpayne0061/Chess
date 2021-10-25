@@ -4,6 +4,7 @@ namespace Chess.Models
 {
     public class ChessPiece
     {
+        protected PieceNames _pieceName;
         public readonly Color Color;
         public ChessPiece(int x, int y, Color color)
         {
@@ -11,9 +12,10 @@ namespace Chess.Models
             Color = color;
             IsFirstMove = true;
         }
-        public string Name { get; set; }
+        public string Name { get { return _pieceName.ToString(); } }
         public Location CurrentLocation { get; set; }
         public bool IsFirstMove { get; set; }
+
     }
 
 }

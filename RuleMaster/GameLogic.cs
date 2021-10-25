@@ -7,12 +7,12 @@ using System.Linq;
 
 namespace ChessGame
 {
-    public class Game
+    public class GameLogic
     {
         bool _whitesTurn = true;
         HashSet<ChessPiece> _chessPieces;
 
-        private Color GetCurrentPlayerColor
+        private Color _currentPlayerColor
         {
             get
             {
@@ -20,7 +20,7 @@ namespace ChessGame
             }
         }
 
-        private Color GetOtherPlayerColor
+        private Color _otherPlayerColor
         {
             get
             {
@@ -28,7 +28,7 @@ namespace ChessGame
             }
         }
 
-        public Game()
+        public GameLogic()
         {
             var chessPieces = new HashSet<ChessPiece>();
 
@@ -74,9 +74,9 @@ namespace ChessGame
 
         public PlayResult MakeMove(Location currentLocation, Location proposedLocation)
         {
-            ChessPiece chessPiece = _chessPieces.Where(p => p.CurrentLocation.X == currentLocation.X && p.CurrentLocation.Y == currentLocation.Y).FirstOrDefault();
+            ChessPiece chessPiece = _chessPieces.Where(p => p.CurrentLocation.Equals(currentLocation)).FirstOrDefault();
 
-            if(chessPiece == null)
+            if (chessPiece == null)
             {
                 var nonValidSpace = new PlayResult($"You have not selected a valid move");
 
@@ -84,9 +84,9 @@ namespace ChessGame
                 return nonValidSpace;
             }
 
-            if(GetCurrentPlayerColor != chessPiece.Color)
+            if(_currentPlayerColor != chessPiece.Color)
             {
-                var wrongPlayer = new PlayResult($"It is {GetCurrentPlayerColor}'s turn");
+                var wrongPlayer = new PlayResult($"It is {_currentPlayerColor}'s turn");
 
                 wrongPlayer.PlayValid = false;
                 return wrongPlayer;
@@ -94,7 +94,7 @@ namespace ChessGame
 
             Location oldLocation = new Location(chessPiece.CurrentLocation.X, chessPiece.CurrentLocation.Y);
 
-            bool playerIsInCheckBeforeMove = PiecesThatCanCaptureKing(GetCurrentPlayerColor).Any();
+            bool playerIsInCheckBeforeMove = PiecesThatCanCaptureKing(_currentPlayerColor).Any();
 
             var availableLocations = GetAvailableMoves(chessPiece);
 
@@ -110,18 +110,16 @@ namespace ChessGame
 
             var playResult = new PlayResult();
 
-            playResult.CapturedPiece = _chessPieces.Where(c => c.CurrentLocation.X == proposedLocation.X &&
-                                c.CurrentLocation.Y == proposedLocation.Y).FirstOrDefault();
+            playResult.CapturedPiece = _chessPieces.Where(c => c.CurrentLocation.Equals(proposedLocation)).FirstOrDefault();
 
             if(playResult.CapturedPiece != null)
             {
-                _chessPieces.RemoveWhere(c => c.CurrentLocation.X == proposedLocation.X &&
-                                c.CurrentLocation.Y == proposedLocation.Y);
+                _chessPieces.RemoveWhere(c => c.CurrentLocation.Equals(proposedLocation));
             }
 
             chessPiece.CurrentLocation = proposedLocation;
 
-            bool playerIsInCheckAfterMove = PiecesThatCanCaptureKing(GetCurrentPlayerColor).Any();
+            bool playerIsInCheckAfterMove = PiecesThatCanCaptureKing(_currentPlayerColor).Any();
 
             if (playerIsInCheckAfterMove)
             {
@@ -138,9 +136,9 @@ namespace ChessGame
             playResult.EndLocation = proposedLocation;
 
 
-            var piecesThatCanCaptureKing = PiecesThatCanCaptureKing(GetOtherPlayerColor);
+            var piecesThatCanCaptureKing = PiecesThatCanCaptureKing(_otherPlayerColor);
             playResult.IsCheck = piecesThatCanCaptureKing.Any();
-            playResult.IsCheckMate = playResult.IsCheck ? IsCheckMate(GetOtherPlayerColor, piecesThatCanCaptureKing) : false;
+            playResult.IsCheckMate = playResult.IsCheck ? IsCheckMate(_otherPlayerColor, piecesThatCanCaptureKing) : false;
             chessPiece.IsFirstMove = false;
 
             if (playResult.PlayValid && IsEligibleForPawnPromotion(chessPiece, proposedLocation))
@@ -165,7 +163,7 @@ namespace ChessGame
             Color color = _whitesTurn ? Color.White : Color.Black;
 
             Pawn pawn = (Pawn)_chessPieces.Where(x => x.Color == color
-                && x.CurrentLocation.X == pawnPromotion.Location.X && x.CurrentLocation.Y == pawnPromotion.Location.Y).Single();
+                && x.CurrentLocation.Equals(pawnPromotion.Location)).Single();
 
             _chessPieces.Remove(pawn);
 
@@ -195,7 +193,7 @@ namespace ChessGame
             pawnPromotion.Turn = _whitesTurn ? 1 : 0;
         }
 
-        public bool IsEligibleForPawnPromotion(ChessPiece chessPiece, Location proposedLocation)
+        private bool IsEligibleForPawnPromotion(ChessPiece chessPiece, Location proposedLocation)
         {
             if(chessPiece is Pawn && chessPiece.Color == Color.Black && proposedLocation.Y == 0)
             {
@@ -210,7 +208,7 @@ namespace ChessGame
             return false;
         }
 
-        public HashSet<ChessPiece> PiecesThatCanCaptureKing(Color color)
+        private HashSet<ChessPiece> PiecesThatCanCaptureKing(Color color)
         {
             ChessPiece king = _chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 
@@ -219,7 +217,7 @@ namespace ChessGame
             return PositionCanBeCapturedBy(kingLocation, king.Color);
         }
 
-        bool IsCheckMate(Color color, HashSet<ChessPiece> piecesThatCanCaptureKing)
+        private bool IsCheckMate(Color color, HashSet<ChessPiece> piecesThatCanCaptureKing)
         {
             King king = (King)_chessPieces.Where(c => c is King && c.Color == color).FirstOrDefault();
 
@@ -227,7 +225,8 @@ namespace ChessGame
 
             Color opposingColor = Color.White == color ? Color.Black : Color.White;
 
-            HashSet<Location> availableMoves = GetAllAvailableLocations(opposingColor).Where(x => x.Key.Name != "King").SelectMany(x => x.Value).ToHashSet();
+            HashSet<Location> availableMoves = GetAllAvailableLocations(opposingColor)
+                .Where(x => x.Key.Name != PieceNames.King.ToString()).SelectMany(x => x.Value).ToHashSet();
 
             if (KingCanEscape(king))
             {
@@ -415,8 +414,6 @@ namespace ChessGame
 
             return locations;
         }
-
-
 
         public Dictionary<ChessPiece, HashSet<Location>> GetAllAvailableLocations(Color color)
         {
@@ -634,9 +631,9 @@ namespace ChessGame
                 return false;
             }
 
-            var chp = _chessPieces.Where(c => c.CurrentLocation.X == x && c.CurrentLocation.Y == y).FirstOrDefault();
+            var chessPiece = _chessPieces.Where(c => c.CurrentLocation.Equals(x, y)).FirstOrDefault();
 
-            return (chp == null) || (chp != null && chp.Color != attackingColor);
+            return (chessPiece == null) || (chessPiece != null && chessPiece.Color != attackingColor);
 
         }
 

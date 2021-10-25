@@ -6,7 +6,7 @@ namespace Chess.Models.Pieces
     {
         public Bishop(int x, int y, Color color) : base(x, y, color)
         {
-            Name = "Bishop";
+            _pieceName = PieceNames.Bishop;
         }
     }
 }
