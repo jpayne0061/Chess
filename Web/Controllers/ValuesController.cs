@@ -20,7 +20,7 @@ namespace Web.Controllers
         GameFlow _gameFlow;
 
         public ValuesController(IMemoryCache memoryCache, 
-                            IHubContext<ChatHub> hubContext, 
+                            IHubContext<MessageHub> hubContext, 
                             IPlayResultDal playResultDal, 
                             IGameSessionDal gameSessionDal)
         {

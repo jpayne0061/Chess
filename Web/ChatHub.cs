@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Web
 {
-    public class ChatHub : Hub
+    public class MessageHub : Hub
     {
         public async Task SendMessage(string msg)
         {

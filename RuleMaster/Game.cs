@@ -164,6 +164,11 @@ namespace ChessGame
 
             Color color = _whitesTurn ? Color.White : Color.Black;
 
+            Pawn pawn = (Pawn)_chessPieces.Where(x => x.Color == color
+                && x.CurrentLocation.X == pawnPromotion.Location.X && x.CurrentLocation.Y == pawnPromotion.Location.Y).Single();
+
+            _chessPieces.Remove(pawn);
+
             switch (pawnPromotion.PieceName)
             {
                 case "Rook":

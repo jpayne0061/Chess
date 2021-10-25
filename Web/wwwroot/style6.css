@@ -12,7 +12,6 @@
     outline-style: none;
 }
 
-
 .selected {
     box-shadow: 0px 0px 0px 10px black inset;
 }
@@ -94,6 +93,33 @@
     overflow-wrap: break-word;
     font-size: 38px;
     margin-bottom: 10px;
+}
+
+#pawn-promotion-choices {
+    text-align: center;
+    margin: auto;
+    font-size: 3.0em;
+    border: 1px solid black;
+    border-radius: 3px;
+    background-color: #fff;
+}
+
+#pawn-promotion-choices span:hover {
+    border: 1px solid #737373;
+}
+
+#pawn-promotion-white {
+    position: fixed; /* Sit on top of the page content */
+    display: none; /* Hidden by default */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 1000; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
 }
 
 @media screen and (min-width: 1000px) {

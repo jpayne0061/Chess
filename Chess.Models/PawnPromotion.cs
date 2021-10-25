@@ -8,5 +8,6 @@
         public PlayResult Message { get; set; }
         public string Command { get; set; }
         public int Turn { get; set; }
+        public int PromotedPieceColor { get; set; }
     }
 }

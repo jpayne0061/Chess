@@ -1,7 +1,7 @@
 ﻿using Chess.Models;
+using Chess.Models.Enums;
 using ChessGame;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,11 +11,11 @@ namespace Web.Services
 {
     public class GameFlow
     {
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<MessageHub> _hubContext;
         private readonly IGameSessionDal _gameSessionDal;
         private readonly IPlayResultDal _playResultDal;
 
-        public GameFlow(IHubContext<ChatHub> hubContext, IPlayResultDal playResultDal, IGameSessionDal gameSessionDal)
+        public GameFlow(IHubContext<MessageHub> hubContext, IPlayResultDal playResultDal, IGameSessionDal gameSessionDal)
         {
             _hubContext = hubContext;
             _gameSessionDal = gameSessionDal;
@@ -38,8 +38,10 @@ namespace Web.Services
 
             if (pr.PlayValid)
             {
+                Message message = new Message(MessageType.MovePiece);
+                message.MessageContent = pr;
                 pr.Command = command;
-                await _hubContext.Clients.All.SendAsync(gameId, pr);
+                await _hubContext.Clients.All.SendAsync(gameId, message);
             }
 
             _playResultDal.SavePlayResult(pr);
@@ -51,7 +53,10 @@ namespace Web.Services
         {
             game.PromotePawn(pawnPromotion);
 
-            await _hubContext.Clients.All.SendAsync(pawnPromotion.GameKey, pawnPromotion);
+            Message message = new Message(MessageType.NotifyPawnPromotionChoice);
+            message.MessageContent = pawnPromotion;
+
+            await _hubContext.Clients.All.SendAsync(pawnPromotion.GameKey, message);
         }
 
         public string CreateGame()
@@ -75,7 +80,10 @@ namespace Web.Services
 
         public async Task SendJoinNotification(string gameId)
         {
-            await _hubContext.Clients.All.SendAsync(gameId.Trim(), "player-joined");
+            Message message = new Message(MessageType.PlayerJoined);
+            message.MessageContent = "player-joined";
+
+            await _hubContext.Clients.All.SendAsync(gameId.Trim(), message);
         }
 
         private string GenerateGameKey()
