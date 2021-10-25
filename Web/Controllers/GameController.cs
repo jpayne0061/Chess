@@ -93,7 +93,7 @@ namespace Web.Controllers
 
             foreach (var game in games)
             {
-                game.DateDisplay = Math.Abs(Math.Floor((DateTime.Now - game.DateStarted).TotalMinutes)).ToString() + " minutes ago";
+                game.DateDisplay = Math.Abs(Math.Floor((DateTime.Now - game.DateStarted.ToLocalTime()).TotalMinutes)).ToString() + " minutes ago";
             }
 
             return games;
