@@ -4,7 +4,9 @@ using Chess.Models.Pieces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Chess.UnitTests")]
 namespace ChessGame
 {
     public class GameLogic
@@ -72,6 +74,12 @@ namespace ChessGame
             _chessPieces = chessPieces;
         }
 
+        
+        internal void OverridePieces(HashSet<ChessPiece> chessPieces)
+        {
+            _chessPieces = chessPieces;
+        }
+
         public PlayResult MakeMove(Location currentLocation, Location proposedLocation)
         {
             ChessPiece chessPiece = _chessPieces.Where(p => p.CurrentLocation.Equals(currentLocation)).FirstOrDefault();
@@ -112,11 +120,11 @@ namespace ChessGame
 
             playResult.CapturedPiece = _chessPieces.Where(c => c.CurrentLocation.Equals(proposedLocation)).FirstOrDefault();
 
-            if(playResult.CapturedPiece != null)
+
+            if (playResult.CapturedPiece != null)
             {
                 _chessPieces.RemoveWhere(c => c.CurrentLocation.Equals(proposedLocation));
             }
-
             chessPiece.CurrentLocation = proposedLocation;
 
             bool playerIsInCheckAfterMove = PiecesThatCanCaptureKing(_currentPlayerColor).Any();
@@ -240,9 +248,35 @@ namespace ChessGame
 
             ChessPiece pieceThatCanCaptureKing = piecesThatCanCaptureKing.First();
 
-            if(PositionCanBeCapturedBy(pieceThatCanCaptureKing.CurrentLocation, pieceThatCanCaptureKing.Color).Any())
+            HashSet<ChessPiece> piecesThatCanCaptureCheckingPiece = PositionCanBeCapturedBy(pieceThatCanCaptureKing.CurrentLocation, pieceThatCanCaptureKing.Color);
+
+            if (piecesThatCanCaptureCheckingPiece.Any())
             {
-                return false;
+                foreach (var piece in piecesThatCanCaptureCheckingPiece)
+                {
+                    if(piece is King)
+                    {
+                        Location currentLocation = piece.CurrentLocation;
+
+                        //ensure king is not in check if capturing checking piece
+                        king.CurrentLocation = pieceThatCanCaptureKing.CurrentLocation;
+
+                        if (PiecesThatCanCaptureKing(_otherPlayerColor).Any())
+                        {
+                            king.CurrentLocation = currentLocation;
+                        }
+                        else
+                        {
+                            king.CurrentLocation = currentLocation;
+
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             }
 
             if(pieceThatCanCaptureKing is Knight || pieceThatCanCaptureKing is Pawn)
@@ -330,7 +364,17 @@ namespace ChessGame
         {
             HashSet<Location> capturePath = new HashSet<Location>();
 
-            var slope = (capturerPosition.Y - targetPosition.Y) / (capturerPosition.X - targetPosition.X);
+            int slope = 0;
+
+            if(capturerPosition.X - targetPosition.X == 0)
+            {
+                slope = 0;
+            }
+            else
+            {
+                slope = (capturerPosition.Y - targetPosition.Y) / (capturerPosition.X - targetPosition.X);
+            }
+
             var yIntercept = targetPosition.Y - slope * targetPosition.X;
 
             Location minXLocation = targetPosition.X < capturerPosition.X ? targetPosition : capturerPosition;
@@ -349,13 +393,26 @@ namespace ChessGame
 
         bool KingCanEscape(King king)
         {
+            Location currentLocation = king.CurrentLocation;
+
             HashSet<Location> availableMoves = GetAvailableMoves(king);
 
             foreach (Location location in availableMoves)
             {
                 if (!PositionCanBeCapturedBy(location, king.Color).Any())
                 {
-                    return true;
+                    king.CurrentLocation = location;
+
+                    if(PiecesThatCanCaptureKing(_otherPlayerColor).Any())
+                    {
+                        king.CurrentLocation = currentLocation;
+                    }
+                    else
+                    {
+                        king.CurrentLocation = currentLocation;
+
+                        return true;
+                    }
                 }
             }
 
