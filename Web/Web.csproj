@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Chess.Models\Chess.Models.csproj" />
-    <ProjectReference Include="..\RuleMaster\Chess.Game.csproj" />
+    <ProjectReference Include="..\Chess.Game\Chess.Game.csproj" />
   </ItemGroup>
 
 </Project>

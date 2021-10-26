@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Models", "Chess.Models\Chess.Models.csproj", "{E2A1C59D-4E50-41F8-B881-A1B204F833CC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Game", "RuleMaster\Chess.Game.csproj", "{AF0331C0-1D02-4A4C-8454-117722B8ACD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Game", "Chess.Game\Chess.Game.csproj", "{AF0331C0-1D02-4A4C-8454-117722B8ACD1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "Web\Web.csproj", "{A117F77D-E545-4BB8-A8CF-748027C4CF82}"
 EndProject
