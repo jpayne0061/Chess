@@ -94,6 +94,8 @@ function listRecentlyStartedGames(gamesText) {
         gameDisplay.appendChild(node);
     }
 
+    gameDisplay.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
+
     writeMessage('');
 }
 
